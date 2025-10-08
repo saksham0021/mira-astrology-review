@@ -613,6 +613,9 @@ def export_data():
 @app.route('/stats')
 def get_stats():
     """Get review statistics - count reviews from Google Sheets"""
+    # Check if Google Sheets is configured
+    google_sheets_connected = google_sync is not None
+    
     conn = sqlite3.connect('mira_analysis.db')
     cursor = conn.cursor()
     
@@ -673,7 +676,9 @@ def get_stats():
         'kundli_accuracy': round(accuracies[0] or 0, 2),
         'dasha_accuracy': round(accuracies[1] or 0, 2),
         'dosha_accuracy': round(accuracies[2] or 0, 2),
-        'analysis_accuracy': round(accuracies[3] or 0, 2)
+        'analysis_accuracy': round(accuracies[3] or 0, 2),
+        'google_sheets_connected': google_sheets_connected,
+        'google_sheets_url': app.config['GOOGLE_SHEETS_URL'] if google_sheets_connected else None
     }))
     response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
     response.headers['Pragma'] = 'no-cache'

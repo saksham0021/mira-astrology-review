@@ -120,6 +120,37 @@
             transition: all 0.3s ease;
         }
 
+        .config-warning {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #856404;
+            display: none;
+        }
+
+        .config-warning.show {
+            display: block;
+        }
+
+        .config-warning h4 {
+            margin: 0 0 10px 0;
+            color: #856404;
+        }
+
+        .config-warning p {
+            margin: 5px 0;
+            font-size: 0.95em;
+        }
+
+        .config-warning code {
+            background: #fff;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+
         .stat-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 25px var(--shadow);
@@ -2664,6 +2695,14 @@
             <h1>🔮 Mira Astrology Review System</h1>
         </div>
 
+        <div id="configWarning" class="config-warning">
+            <h4>⚠️ Google Sheets Not Connected</h4>
+            <p>The application is not connected to Google Sheets. Please configure:</p>
+            <p><strong>1.</strong> Set <code>GOOGLE_CREDENTIALS_FILE</code> environment variable with your service account credentials</p>
+            <p><strong>2.</strong> Set <code>GOOGLE_SHEETS_URL</code> environment variable with your Google Sheets URL</p>
+            <p>Without Google Sheets, no data can be loaded.</p>
+        </div>
+
         <div class="stats-grid" id="statsGrid">
             <div class="stat-card">
                 <h3 id="totalSessions">0</h3>
@@ -2751,6 +2790,15 @@
             document.getElementById('reviewedSessions').textContent = stats.reviewed_sessions;
             document.getElementById('pendingSessions').textContent = stats.pending_sessions;
             // avgRating element removed - no longer updating
+            
+            // Show/hide configuration warning based on Google Sheets connection
+            const warningElement = document.getElementById('configWarning');
+            if (stats.google_sheets_connected === false) {
+                warningElement.classList.add('show');
+                console.warn('Google Sheets is not connected. Data cannot be loaded.');
+            } else {
+                warningElement.classList.remove('show');
+            }
         }
 
         async function loadStats() {
@@ -2776,6 +2824,9 @@
                 updateStatsDisplay(stats);
             } catch (error) {
                 console.error('Error loading stats:', error);
+                // Show warning if stats fail to load
+                const warningElement = document.getElementById('configWarning');
+                warningElement.classList.add('show');
             }
         }
 
