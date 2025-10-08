@@ -29,56 +29,6 @@ sheets_cache = {
     'cache_duration': 300  # 5 minutes cache
 }
 
-def get_cached_sheets_data():
-    """Get Google Sheets data with caching to improve performance"""
-    current_time = time.time()
-    
-    # Check if cache is valid
-    if (sheets_cache['data'] is not None and 
-        current_time - sheets_cache['last_updated'] < sheets_cache['cache_duration']):
-        print("DEBUG: Using cached Google Sheets data")
-        return sheets_cache['data']
-    
-    # Cache is expired or empty, fetch new data
-    if google_sync:
-        try:
-            print("DEBUG: Fetching fresh Google Sheets data")
-            data = google_sync.get_all_data()
-            sheets_cache['data'] = data
-            sheets_cache['last_updated'] = current_time
-            print(f"DEBUG: Cached {len(data)} records from Google Sheets")
-            return data
-        except Exception as e:
-            print(f"ERROR: Failed to fetch Google Sheets data: {e}")
-            # Return cached data if available, even if expired
-            return sheets_cache['data'] if sheets_cache['data'] else []
-    
-    return []
-
-# Google Sheets configuration
-app.config['GOOGLE_SHEETS_URL'] = 'https://docs.google.com/spreadsheets/d/1fd3YNixXYHcvyDgq2TcOHG6PGlzryt5T4nT2ObXUScM/edit?usp=sharing'
-app.config['GOOGLE_CREDENTIALS_FILE'] = 'credentials.json/credentials.json'
-
-# Initialize Google Sheets sync if available
-google_sync = None
-if GOOGLE_SHEETS_ENABLED and os.path.exists(app.config['GOOGLE_CREDENTIALS_FILE']):
-    try:
-        google_sync = GoogleSheetsSync(
-            credentials_file=app.config['GOOGLE_CREDENTIALS_FILE'],
-            spreadsheet_url=app.config['GOOGLE_SHEETS_URL']
-        )
-        if google_sync.connect():
-            print("SUCCESS: Google Sheets integration enabled")
-        else:
-            google_sync = None
-    except Exception as e:
-        print(f"WARNING: Could not initialize Google Sheets: {e}")
-        google_sync = None
-
-# Create necessary directories
-os.makedirs('exports', exist_ok=True)
-
-
 def init_db():
     """Initialize SQLite database"""
     conn = sqlite3.connect('mira_analysis.db')
@@ -132,6 +82,98 @@ def init_db():
     
     conn.commit()
     conn.close()
+
+def get_cached_sheets_data():
+    """Get Google Sheets data with caching to improve performance"""
+    current_time = time.time()
+    
+    # Check if cache is valid
+    if (sheets_cache['data'] is not None and 
+        current_time - sheets_cache['last_updated'] < sheets_cache['cache_duration']):
+        print("DEBUG: Using cached Google Sheets data")
+        return sheets_cache['data']
+    
+    # Cache is expired or empty, fetch new data
+    if google_sync:
+        try:
+            print("DEBUG: Fetching fresh Google Sheets data")
+            data = google_sync.get_all_data()
+            sheets_cache['data'] = data
+            sheets_cache['last_updated'] = current_time
+            print(f"DEBUG: Cached {len(data)} records from Google Sheets")
+            return data
+        except Exception as e:
+            print(f"ERROR: Failed to fetch Google Sheets data: {e}")
+            # Return cached data if available, even if expired
+            return sheets_cache['data'] if sheets_cache['data'] else []
+    
+    return []
+
+# Google Sheets configuration
+app.config['GOOGLE_SHEETS_URL'] = os.environ.get('GOOGLE_SHEETS_URL') or 'https://docs.google.com/spreadsheets/d/1fd3YNixXYHcvyDgq2TcOHG6PGlzryt5T4nT2ObXUScM/edit?usp=sharing'
+app.config['GOOGLE_CREDENTIALS_FILE'] = os.environ.get('GOOGLE_CREDENTIALS_FILE') or 'credentials.json/credentials.json'
+app.config['GOOGLE_CREDENTIALS_JSON'] = os.environ.get('GOOGLE_CREDENTIALS_JSON')  # For env var credentials
+
+# Initialize Google Sheets sync if available
+google_sync = None
+if GOOGLE_SHEETS_ENABLED:
+    try:
+        # Try environment variable first (for Vercel/production)
+        if app.config.get('GOOGLE_CREDENTIALS_JSON'):
+            print("INFO: Using Google credentials from environment variable")
+            import tempfile
+            import json as json_lib
+            
+            # Create temporary credentials file from environment variable
+            credentials_data = app.config['GOOGLE_CREDENTIALS_JSON']
+            if isinstance(credentials_data, str):
+                # Validate it's proper JSON
+                json_lib.loads(credentials_data)
+            
+            with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+                f.write(credentials_data if isinstance(credentials_data, str) else json_lib.dumps(credentials_data))
+                temp_creds_file = f.name
+            
+            google_sync = GoogleSheetsSync(
+                credentials_file=temp_creds_file,
+                spreadsheet_url=app.config['GOOGLE_SHEETS_URL']
+            )
+            
+        # Fallback to credentials file
+        elif os.path.exists(app.config['GOOGLE_CREDENTIALS_FILE']):
+            print("INFO: Using Google credentials from file")
+            google_sync = GoogleSheetsSync(
+                credentials_file=app.config['GOOGLE_CREDENTIALS_FILE'],
+                spreadsheet_url=app.config['GOOGLE_SHEETS_URL']
+            )
+        else:
+            print("WARNING: No Google credentials found (checked env var GOOGLE_CREDENTIALS_JSON and file path)")
+            google_sync = None
+        
+        if google_sync and google_sync.connect():
+            print("SUCCESS: Google Sheets integration enabled")
+            
+            # Auto-sync data from Google Sheets to database on startup
+            try:
+                print("INFO: Auto-syncing data from Google Sheets to database...")
+                init_db()  # Ensure database exists
+                google_sync.sync_to_database()
+                print("SUCCESS: Auto-sync completed")
+            except Exception as sync_error:
+                print(f"WARNING: Auto-sync failed: {sync_error}")
+                import traceback
+                traceback.print_exc()
+        else:
+            google_sync = None
+            
+    except Exception as e:
+        print(f"WARNING: Could not initialize Google Sheets: {e}")
+        import traceback
+        traceback.print_exc()
+        google_sync = None
+
+# Create necessary directories
+os.makedirs('exports', exist_ok=True)
 
 @app.route('/')
 def index():
@@ -615,6 +657,9 @@ def get_stats():
     """Get review statistics - count reviews from Google Sheets"""
     # Check if Google Sheets is configured
     google_sheets_connected = google_sync is not None
+    
+    # Ensure database is initialized
+    init_db()
     
     conn = sqlite3.connect('mira_analysis.db')
     cursor = conn.cursor()
