@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Layout - User Info One Row</title>
+    <style>
+        :root {
+            --mira-red: #C41E3A;
+            --mira-red-dark: #A01828;
+            --mira-cream-light: #FFF8F0;
+            --mira-cream: #F5E6D3;
+            --text-dark: #2C1810;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        /* User Info Horizontal Layout - Always One Row */
+        .user-info-tabs {
+            display: flex;
+            background: var(--mira-cream-light);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            gap: 15px;
+            flex-wrap: nowrap;
+            flex-direction: row;
+            justify-content: space-around;
+            border: 2px solid var(--mira-cream);
+        }
+
+        .user-info-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 80px;
+            flex: 1;
+        }
+
+        .user-info-label {
+            font-size: 0.75em;
+            color: var(--mira-red-dark);
+            font-weight: 600;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .user-info-value {
+            font-size: 1em;
+            font-weight: bold;
+            color: var(--text-dark);
+            padding: 6px 12px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            min-width: 60px;
+            text-align: center;
+            border: 1px solid var(--mira-cream);
+        }
+
+        .user-info-value.rating {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #333;
+        }
+
+        .user-info-value.gender-female {
+            background: linear-gradient(135deg, #ff9a9e, #fecfef);
+            color: #333;
+        }
+
+        .test-info {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--mira-red);
+        }
+    </style>
+</head>
+<body>
+    <div class="test-info">
+        <h2>🧪 User Info Layout Test</h2>
+        <p><strong>Expected:</strong> All 4 items (User ID, Age, Gender, Rating) should be in ONE horizontal row</p>
+        <p><strong>Screen Width:</strong> <span id="width"></span>px</p>
+    </div>
+
+    <!-- User Information Horizontal Tabs -->
+    <div class="user-info-tabs">
+        <div class="user-info-item">
+            <div class="user-info-label">User ID</div>
+            <div class="user-info-value">74952</div>
+        </div>
+        <div class="user-info-item">
+            <div class="user-info-label">Age</div>
+            <div class="user-info-value">N/A</div>
+        </div>
+        <div class="user-info-item">
+            <div class="user-info-label">Gender</div>
+            <div class="user-info-value gender-female">female</div>
+        </div>
+        <div class="user-info-item">
+            <div class="user-info-label">Rating</div>
+            <div class="user-info-value rating">1</div>
+        </div>
+    </div>
+
+    <div class="test-info">
+        <h3>✅ Success Criteria:</h3>
+        <ul>
+            <li>All 4 items visible in one horizontal row</li>
+            <li>Items evenly spaced across the width</li>
+            <li>Mira brand colors applied</li>
+            <li>Compact but readable layout</li>
+        </ul>
+    </div>
+
+    <script>
+        document.getElementById('width').textContent = window.innerWidth;
+    </script>
+</body>
+</html>

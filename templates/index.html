@@ -1,0 +1,4223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Mira Astrology - Review System v13.0 - Multi-Device</title>
+    <!-- Force cache refresh with timestamp -->
+    <meta name="cache-buster" content="20251007-121030">
+    <script>
+        // Force reload if version mismatch
+        const CURRENT_VERSION = 'v13.0';
+        const storedVersion = localStorage.getItem('app_version');
+        if (storedVersion !== CURRENT_VERSION) {
+            localStorage.setItem('app_version', CURRENT_VERSION);
+            if (storedVersion) {
+                location.reload(true);
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --mira-red: #C41E3A;
+            --mira-red-dark: #A01828;
+            --mira-red-light: #D63851;
+            --mira-cream: #F5E6D3;
+            --mira-cream-dark: #E8D4BC;
+            --mira-cream-light: #FFF8F0;
+            --text-dark: #2C1810;
+            --text-light: #6B4E3D;
+            --shadow: rgba(196, 30, 58, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background: linear-gradient(135deg, var(--mira-cream-light) 0%, var(--mira-cream) 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text-dark);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--mira-red) 0%, var(--mira-red-dark) 100%);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px var(--shadow);
+            margin-bottom: 30px;
+            text-align: center;
+            border: 3px solid var(--mira-cream);
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+        }
+
+        .header h1 {
+            color: var(--mira-cream);
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 400;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.5em;
+                margin-bottom: 5px;
+            }
+        }
+
+        .header p {
+            color: var(--mira-cream-dark);
+            font-size: 1.1em;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        @media (max-width: 768px) {
+            .header p {
+                font-size: 0.9em;
+            }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px var(--shadow);
+            text-align: center;
+            border: 2px solid var(--mira-cream);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px var(--shadow);
+            border-color: var(--mira-red-light);
+        }
+
+        .stat-card h3 {
+            color: var(--mira-red);
+            font-size: 2em;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .stat-card p {
+            color: var(--text-light);
+            font-size: 0.9em;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .upload-section {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px var(--shadow);
+            margin-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            border: 2px solid var(--mira-cream);
+        }
+
+        .upload-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-wrapper input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .checkbox-wrapper label {
+            font-size: 0.9em;
+            color: #666;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        /* Mobile Responsive Styles - Consolidated */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+                margin-bottom: 15px;
+            }
+
+            .stat-card {
+                padding: 12px;
+            }
+
+            .stat-card h3 {
+                font-size: 1.3em;
+            }
+
+            .stat-card p {
+                font-size: 0.8em;
+            }
+
+            .upload-section {
+                padding: 12px;
+                margin-bottom: 15px;
+                gap: 8px;
+            }
+
+            .filter-section {
+                padding: 12px;
+                margin-bottom: 15px;
+            }
+
+            .filter-section h2 {
+                font-size: 1.1em;
+                margin-bottom: 10px;
+            }
+
+            .search-controls {
+                display: flex;
+                gap: 8px;
+                align-items: stretch;
+            }
+
+            .search-controls input {
+                flex: 1;
+                padding: 10px;
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+
+            .sessions-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .card-status-badges {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 4px;
+                margin-bottom: 8px;
+            }
+
+            .review-status, .marking-status {
+                font-size: 0.7em;
+                padding: 3px 6px;
+            }
+
+            .session-header {
+                flex-direction: row;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .session-rating {
+                font-size: 0.85em;
+                padding: 3px 6px;
+            }
+
+            .session-details {
+                grid-template-columns: 1fr;
+                gap: 4px;
+            }
+
+            .detail-item {
+                font-size: 0.8em;
+            }
+
+            .btn {
+                padding: 10px 16px;
+                font-size: 0.9em;
+            }
+
+            .review-status {
+                font-size: 0.65em;
+                padding: 3px 8px;
+            }
+
+            .review-completed, .review-correct, .review-incorrect, .review-cant-judge {
+                font-size: 0.65em;
+                padding: 3px 8px;
+            }
+
+            /* Modal Mobile Styles - Fix Overflow */
+            .modal {
+                padding: 0;
+                margin: 0;
+            }
+
+            .modal-content {
+                width: 100vw;
+                max-width: 100vw;
+                height: 100vh;
+                max-height: 100vh;
+                margin: 0;
+                border-radius: 0;
+                overflow-y: auto;
+                overflow-x: hidden;
+                box-sizing: border-box;
+            }
+
+            .modal-header {
+                padding: 8px 15px;
+                flex-direction: column;
+                gap: 8px;
+                text-align: center;
+                position: sticky;
+                top: 0;
+                background: var(--mira-red);
+                z-index: 10;
+            }
+
+            .close {
+                position: absolute;
+                top: 8px;
+                right: 12px;
+                font-size: 20px;
+                color: white;
+            }
+
+            /* User Info Tabs Mobile - Better Spacing */
+            .user-info-tabs {
+                flex-direction: row;
+                gap: 6px;
+                padding: 12px 8px;
+                margin-bottom: 12px;
+            }
+
+            .user-info-item {
+                padding: 4px;
+                font-size: 0.7em;
+                min-width: 65px;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .user-info-label {
+                font-size: 0.65em;
+                margin-bottom: 3px;
+                font-weight: 700;
+            }
+
+            .user-info-value {
+                font-size: 0.85em;
+                padding: 5px 10px;
+                min-width: 55px;
+            }
+
+            /* Data Sections Mobile - Better Spacing */
+            .data-section {
+                margin-bottom: 12px;
+                padding: 8px;
+                border-radius: 8px;
+                width: 100%;
+                box-sizing: border-box;
+                overflow-x: hidden;
+            }
+
+            .data-section h3 {
+                font-size: 0.95em;
+                margin-bottom: 8px;
+                font-weight: 700;
+            }
+
+            .data-section h4 {
+                font-size: 0.8em;
+                margin-bottom: 3px;
+            }
+
+            .kundli-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 2px;
+                column-gap: 4px;
+            }
+
+            .kundli-item {
+                padding: 6px 8px;
+                font-size: 0.75em;
+                border-radius: 5px;
+                border-width: 1px;
+                margin-bottom: 3px;
+            }
+
+            .kundli-item label {
+                font-size: 0.75em;
+                font-weight: 600;
+            }
+
+            .kundli-item span {
+                font-size: 0.75em;
+                font-weight: 500;
+            }
+
+            .planets-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 6px;
+            }
+
+            .planet-card {
+                padding: 6px 8px;
+                font-size: 0.75em;
+                border-radius: 8px;
+            }
+
+            .planet-name {
+                font-size: 0.9em;
+                margin-bottom: 4px;
+            }
+
+            .planet-sign {
+                font-size: 0.85em;
+                margin-bottom: 2px;
+            }
+
+            .planet-house {
+                font-size: 0.75em;
+            }
+
+            .dashas-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .dasha-card {
+                padding: 10px;
+                font-size: 0.85em;
+            }
+
+            .doshas-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .dosha-card {
+                padding: 10px;
+                font-size: 0.85em;
+            }
+
+            /* Summary Mobile */
+            .summary-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .summary-items {
+                grid-template-columns: 1fr 1fr;
+                gap: 3px;
+                column-gap: 6px;
+            }
+
+            .summary-item {
+                font-size: 0.7em;
+                padding: 5px 6px;
+            }
+
+            /* Review Form Mobile */
+            .review-form {
+                padding: 15px;
+                margin-top: 20px;
+            }
+
+            .review-buttons {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .review-btn {
+                padding: 12px 16px;
+                font-size: 0.9em;
+                text-align: center;
+                justify-content: center;
+            }
+
+            .form-group textarea {
+                min-height: 80px;
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .btn {
+                padding: 12px 20px;
+                font-size: 0.9em;
+                width: 100%;
+                justify-content: center;
+            }
+
+            /* Touch-friendly improvements */
+            button, .btn, .review-btn {
+                min-height: 44px; /* iOS recommended touch target */
+                cursor: pointer;
+            }
+
+            select, input[type="file"] {
+                min-height: 44px;
+            }
+
+            .search-controls button {
+                white-space: nowrap;
+                min-width: 80px;
+                display: inline-block;
+            }
+        }
+
+        /* Tablet Styles */
+        @media (max-width: 1024px) and (min-width: 769px) {
+            .sessions-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+
+            .modal-content {
+                width: 90%;
+                margin: 3% auto;
+            }
+
+            .planets-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .filter-section {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px var(--shadow);
+            margin-bottom: 30px;
+            border: 2px solid var(--mira-cream);
+        }
+
+        .filter-section h2 {
+            color: var(--mira-red);
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            font-weight: 500;
+        }
+
+        .search-controls {
+            display: flex;
+            gap: 15px;
+            align-items: stretch;
+        }
+
+        .search-controls input {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid var(--mira-cream-dark);
+            border-radius: 10px;
+            background: white;
+            color: var(--text-dark);
+            font-size: 1em;
+            transition: all 0.3s ease;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .search-controls input:focus {
+            outline: none;
+            border-color: var(--mira-red);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(196, 30, 58, 0.1);
+        }
+
+        .search-controls input::placeholder {
+            color: var(--text-light);
+            opacity: 0.6;
+        }
+
+        .search-controls button {
+            white-space: nowrap;
+            min-width: 100px;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-input-label {
+            display: block;
+            padding: 12px 20px;
+            background: #667eea;
+            color: white;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .file-input-label:hover {
+            background: #5568d3;
+        }
+
+        .file-name {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .sessions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .session-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px var(--shadow);
+            cursor: pointer;
+            transition: all 0.3s;
+            border-left: 5px solid var(--mira-red);
+            position: relative;
+            border: 2px solid var(--mira-cream);
+            border-left-width: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .session-card {
+                padding: 12px;
+                border-radius: 8px;
+                margin-bottom: 8px;
+            }
+        }
+
+        .session-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px var(--shadow);
+            border-color: var(--mira-red-light);
+        }
+
+        .session-card.reviewed {
+            border-left-color: #28a745;
+        }
+
+        .session-card.reviewed::after {
+            content: "✅";
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.2em;
+        }
+
+        .session-card.pending::after {
+            content: "⏳";
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.2em;
+        }
+
+        .session-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .session-header {
+                margin-bottom: 8px;
+            }
+        }
+
+        .session-id {
+            font-weight: bold;
+            color: var(--mira-red);
+            font-size: 1.1em;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        @media (max-width: 768px) {
+            .session-id {
+                font-size: 1em;
+            }
+        }
+
+        .session-rating {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: var(--text-dark);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+        }
+
+        .session-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .session-details {
+                gap: 6px;
+                font-size: 0.85em;
+            }
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: var(--text-light);
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .detail-value {
+            color: var(--text-dark);
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .dosha-indicators {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 768px) {
+            .dosha-indicators {
+                margin-top: 8px;
+                gap: 6px;
+            }
+        }
+
+        .dosha-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .dosha-badge {
+                padding: 3px 6px;
+                font-size: 0.75em;
+            }
+        }
+
+        .dosha-yes {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .dosha-no {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 2% auto;
+            padding: 0;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 1200px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideIn 0.3s;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--mira-red) 0%, var(--mira-red-dark) 100%);
+            color: var(--mira-cream-light);
+            padding: 20px 30px;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid var(--mira-cream);
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5em;
+            font-weight: 400;
+            letter-spacing: 1px;
+        }
+
+        .close {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close:hover {
+            color: #ddd;
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .modal-body {
+                padding: 8px 12px;
+                overflow-x: hidden;
+                box-sizing: border-box;
+                width: 100%;
+            }
+        }
+
+        /* User Info Horizontal Layout - Always One Row */
+        .user-info-tabs {
+            display: flex;
+            background: var(--mira-cream-light);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            gap: 15px;
+            flex-wrap: nowrap;
+            flex-direction: row;
+            justify-content: space-around;
+        }
+
+        .user-info-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 80px;
+            flex: 1;
+        }
+
+        .user-info-label {
+            font-size: 0.75em;
+            color: var(--mira-red-dark);
+            font-weight: 600;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .user-info-value {
+            font-size: 1em;
+            font-weight: bold;
+            color: var(--text-dark);
+            padding: 6px 12px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            min-width: 60px;
+            text-align: center;
+            border: 1px solid var(--mira-cream);
+        }
+
+        .user-info-value.rating {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #333;
+        }
+
+        .user-info-value.gender-male {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+        }
+
+        .user-info-value.gender-female {
+            background: linear-gradient(135deg, #ff9a9e, #fecfef);
+            color: #333;
+        }
+
+        /* Dasha Information Layout */
+        .dasha-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        @media (max-width: 768px) {
+            .dasha-grid {
+                grid-template-columns: repeat(3, 1fr);
+                margin-bottom: 10px;
+            }
+        }
+
+        .data-section {
+            background: var(--mira-cream-light);
+            border: 2px solid var(--mira-cream-dark);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px var(--shadow);
+        }
+        
+        /* Optimized spacing for better performance */
+        .data-section:not([style*="display: none"]) {
+            margin-bottom: 15px;
+        }
+        
+        /* Hide elements efficiently */
+        .hidden-element {
+            display: none !important;
+        }
+
+        @media (max-width: 768px) {
+            .dasha-card {
+                padding: 8px 4px;
+                border-radius: 6px;
+                border-width: 1px;
+            }
+        }
+
+        .dasha-card:hover {
+            border-color: var(--mira-red);
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+
+        @media (max-width: 768px) {
+            .dasha-card:hover {
+                transform: none;
+                box-shadow: none;
+            }
+        }
+
+        .dasha-type {
+            font-size: 0.9em;
+            color: var(--mira-red-dark);
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        @media (max-width: 768px) {
+            .dasha-type {
+                font-size: 0.65em;
+                margin-bottom: 3px;
+            }
+        }
+
+        .dasha-planet {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: var(--mira-red);
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .dasha-planet {
+                font-size: 0.75em;
+                margin-bottom: 2px;
+            }
+        }
+
+        .dasha-time {
+            font-size: 0.85em;
+            color: var(--text-light);
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .dasha-time {
+                font-size: 0.6em;
+                word-break: break-word;
+                white-space: normal;
+                line-height: 1.2;
+            }
+        }
+
+        /* Dosha Status Cards */
+        .dosha-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        @media (max-width: 768px) {
+            .dosha-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 6px;
+                margin-bottom: 10px;
+            }
+        }
+
+        .dosha-card {
+            background: var(--mira-cream-light);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            border: 2px solid var(--mira-cream);
+        }
+
+        @media (max-width: 768px) {
+            .dosha-card {
+                padding: 8px 4px;
+                border-radius: 6px;
+                border-width: 1px;
+            }
+        }
+
+        .dosha-card.positive {
+            border-color: #28a745;
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+        }
+
+        .dosha-card.negative {
+            border-color: var(--mira-red);
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+        }
+
+        .dosha-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--text-dark);
+        }
+
+        @media (max-width: 768px) {
+            .dosha-title {
+                font-size: 0.65em;
+                margin-bottom: 3px;
+            }
+        }
+
+        .dosha-status {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .dosha-status {
+                font-size: 0.75em;
+            }
+        }
+
+        .dosha-card.positive .dosha-status {
+            color: #155724;
+        }
+
+        .dosha-card.negative .dosha-status {
+            color: #721c24;
+        }
+
+        .dosha-remedies {
+            margin-top: 10px;
+            font-size: 0.85em;
+        }
+
+        @media (max-width: 768px) {
+            .dosha-remedies {
+                margin-top: 3px;
+                font-size: 0.6em;
+                display: none; /* Hide remedies on mobile to save space */
+            }
+        }
+
+        .dosha-remedies ul {
+            margin: 5px 0;
+            padding-left: 15px;
+        }
+
+        .dosha-remedies li {
+            margin: 2px 0;
+        }
+
+        /* Kundli Details Styling */
+        .kundli-basic-info {
+            margin-bottom: 20px;
+        }
+
+        .kundli-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .kundli-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 2px;
+                column-gap: 4px;
+            }
+        }
+
+        .kundli-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid var(--mira-cream);
+        }
+
+        .kundli-item label {
+            font-weight: 600;
+            color: var(--text-light);
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .kundli-item span {
+            color: var(--text-dark);
+            font-weight: bold;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        @media (max-width: 768px) {
+            .kundli-item {
+                padding: 5px 8px;
+                border-radius: 5px;
+                border-width: 1px;
+                margin-bottom: 2px;
+            }
+
+            .kundli-item label {
+                font-size: 0.8em;
+                font-weight: 600;
+            }
+
+            .kundli-item span {
+                font-size: 0.8em;
+                font-weight: 500;
+            }
+        }
+
+        /* Planetary Positions */
+        .planetary-positions {
+            margin-top: 20px;
+        }
+
+        .planets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .planets-grid {
+                display: block;
+                width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+        }
+
+        .planet-card {
+            background: white;
+            border: 2px solid var(--mira-cream);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .planet-card:hover {
+            border-color: var(--mira-red-light);
+            box-shadow: 0 3px 10px var(--shadow);
+        }
+
+        @media (max-width: 768px) {
+            .planet-card {
+                display: block;
+                width: 100%;
+                margin: 2px 0;
+                padding: 8px;
+                border-radius: 6px;
+                border: 1px solid var(--mira-cream);
+                background: white;
+                box-sizing: border-box;
+                overflow: hidden;
+                text-align: left;
+            }
+        }
+
+        .planet-name {
+            font-weight: bold;
+            color: var(--mira-red);
+            font-size: 1.1em;
+            margin-bottom: 8px;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        @media (max-width: 768px) {
+            .planet-name {
+                display: inline-block;
+                font-size: 0.9em;
+                font-weight: bold;
+                color: var(--mira-red);
+                margin-right: 8px;
+                margin-bottom: 0;
+                max-width: 25%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                vertical-align: top;
+            }
+        }
+
+        .planet-sign {
+            color: var(--text-dark);
+            font-weight: 600;
+            margin-bottom: 4px;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        @media (max-width: 768px) {
+            .planet-sign {
+                display: inline-block;
+                font-size: 0.8em;
+                color: var(--text-dark);
+                margin-right: 8px;
+                margin-bottom: 0;
+                max-width: 25%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                vertical-align: top;
+            }
+        }
+
+        .planet-degree {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .planet-degree {
+                display: inline-block;
+                font-size: 0.7em;
+                color: #666;
+                margin-right: 8px;
+                margin-bottom: 0;
+                max-width: 20%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                vertical-align: top;
+            }
+        }
+
+        .planet-house {
+            color: var(--text-light);
+            font-size: 0.85em;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        @media (max-width: 768px) {
+            .planet-house {
+                display: inline-block;
+                font-size: 0.7em;
+                color: var(--text-light);
+                margin-bottom: 0;
+                max-width: 25%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                vertical-align: top;
+            }
+        }
+
+        .retrograde-indicator {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #dc3545;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7em;
+            font-weight: bold;
+        }
+
+        /* Yogas Section */
+        .yogas-section {
+            margin-top: 20px;
+        }
+
+        .yogas-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .yoga-badge {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        @keyframes fadeIn {
+            from {opacity: 0;}
+            to {opacity: 1;}
+        }
+
+        @keyframes slideIn {
+            from {transform: translateY(-50px); opacity: 0;}
+            to {transform: translateY(0); opacity: 1;}
+        }
+
+        .data-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: var(--mira-cream-light);
+            border-radius: 15px;
+            border: 1px solid var(--mira-cream);
+        }
+
+        @media (max-width: 768px) {
+            .data-section {
+                margin-bottom: 6px;
+                padding: 8px;
+                border-radius: 6px;
+                width: 100%;
+                box-sizing: border-box;
+                overflow: hidden;
+            }
+        }
+
+        .data-section h3 {
+            color: var(--mira-red);
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .data-section h3 {
+                font-size: 0.85em;
+                margin-bottom: 3px;
+            }
+        }
+
+        .data-section h4 {
+            color: var(--mira-red-dark);
+            margin-bottom: 12px;
+            font-weight: 500;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        @media (max-width: 768px) {
+            .data-section h4 {
+                font-size: 0.75em;
+                margin-bottom: 2px;
+            }
+        }
+
+        .data-row {
+            margin-bottom: 15px;
+        }
+
+        .data-row label {
+            display: block;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        .data-row .value {
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        /* Chart Container Styles */
+        .chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 2px 8px var(--shadow);
+            border: 1px solid var(--mira-cream);
+        }
+
+        @media (max-width: 768px) {
+            .chart-container {
+                padding: 10px;
+                border-radius: 10px;
+            }
+        }
+
+        .chart-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--mira-red);
+        }
+
+        @media (max-width: 768px) {
+            .chart-title {
+                font-size: 1em;
+                margin-bottom: 10px;
+            }
+        }
+
+        .chart-display {
+            text-align: center;
+            min-height: 200px;
+        }
+
+        @media (max-width: 768px) {
+            .chart-display {
+                min-height: 150px;
+            }
+        }
+
+        .chart-display img {
+            max-width: 100%;
+            height: auto;
+            border: 2px solid var(--mira-cream);
+            border-radius: 10px;
+            box-shadow: 0 2px 8px var(--shadow);
+            transition: transform 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .chart-display img {
+                border-width: 1px;
+                border-radius: 8px;
+                transform: scale(1.1);
+                margin: 10px 0;
+            }
+        }
+
+        .chart-display img:hover {
+            transform: scale(1.02);
+        }
+
+        @media (max-width: 768px) {
+            .chart-display img:hover {
+                transform: none;
+            }
+        }
+
+        /* Summary Container Styles */
+        .summary-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .summary-overview {
+            margin-bottom: 25px;
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .dosha-summary-item {
+            background: #fff5f5;
+            border: 1px solid #fed7d7;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .dosha-summary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .dosha-summary-name {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .severity-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 600;
+        }
+
+        .severity-high {
+            background: #fed7d7;
+            color: #c53030;
+        }
+
+        .severity-medium {
+            background: #feebc8;
+            color: #dd6b20;
+        }
+
+        .severity-low {
+            background: #c6f6d5;
+            color: #38a169;
+        }
+
+        .dosha-summary-desc {
+            color: #4a5568;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        .absent-doshas-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .absent-dosha-badge {
+            background: #c6f6d5;
+            color: #38a169;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        /* House Analysis Styles */
+        .house-analysis-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .houses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        /* Mobile optimization - double width boxes for longer zodiac names */
+        @media (max-width: 768px) {
+            .houses-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 3px;
+                margin: 0;
+                padding: 5px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .houses-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 2px;
+                margin: 0;
+                padding: 3px;
+            }
+        }
+
+        .house-item {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        /* Mobile house item optimization */
+        @media (max-width: 768px) {
+            .house-item {
+                padding: 8px 6px;
+                border-radius: 6px;
+                text-align: center;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                min-height: 110px;
+                max-width: none;
+                box-sizing: border-box;
+                overflow: visible;
+                border: 1px solid #ddd;
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .house-item {
+                padding: 6px 4px;
+                min-height: 120px;
+            }
+            
+            .house-planets {
+                font-size: 0.55em !important;
+                min-height: 25px !important;
+                line-height: 1.4 !important;
+            }
+        }
+
+        .house-item:hover {
+            background: #e9ecef;
+            border-color: #007bff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,123,255,0.1);
+        }
+
+        .house-number {
+            font-weight: bold;
+            color: #007bff;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .house-sign {
+            font-size: 12px;
+            color: #6c757d;
+            margin-bottom: 6px;
+        }
+
+        .house-planets {
+            font-size: 13px;
+            color: #495057;
+            font-weight: 500;
+            min-height: 20px;
+            overflow: visible;
+            white-space: normal;
+            word-wrap: break-word;
+        }
+
+        /* Mobile typography optimization */
+        @media (max-width: 768px) {
+            .house-number {
+                font-size: 0.7em;
+                margin-bottom: 3px;
+                word-break: break-word;
+                line-height: 1.2;
+                white-space: normal;
+                overflow: visible;
+                max-width: 100%;
+                font-weight: bold;
+                width: auto;
+                height: auto;
+            }
+            
+            .house-sign {
+                font-size: 0.65em;
+                margin-bottom: 2px;
+                color: #666;
+                font-weight: 600;
+            }
+            
+            .house-planets {
+                font-size: 0.6em;
+                min-height: 20px;
+                line-height: 1.3;
+                word-break: break-word;
+                white-space: normal;
+                overflow: visible;
+                display: block;
+                max-width: 100%;
+            }
+        }
+
+        .house-detail-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .house-detail-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.1);
+        }
+
+        .house-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .house-number {
+            background: rgba(255, 255, 255, 0.2);
+            width: 100px;
+            height: 40px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .house-title {
+            font-weight: 600;
+            font-size: 1em;
+        }
+
+        .house-content {
+            padding: 15px;
+        }
+
+        .house-data-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .house-data-row:last-child {
+            border-bottom: none;
+        }
+
+        .house-data-label {
+            font-weight: 600;
+            color: #555;
+            min-width: 60px;
+        }
+
+        .house-data-value {
+            color: #333;
+            text-align: right;
+            flex: 1;
+            margin-left: 10px;
+        }
+
+        /* Summary Details Styles */
+        .summary-details {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .summary-category h4 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 8px;
+        }
+
+        .summary-items {
+            display: grid;
+            gap: 12px;
+        }
+
+        /* Enhanced Responsive Breakpoints */
+        @media (max-width: 360px) {
+            /* Ultra-compact for very small phones */
+            .summary-items {
+                grid-template-columns: 1fr;
+                gap: 2px;
+                column-gap: 3px;
+            }
+            .user-info-tabs {
+                gap: 4px;
+                padding: 8px 6px;
+            }
+            .user-info-item {
+                min-width: 55px;
+                font-size: 0.65em;
+            }
+        }
+
+        @media (min-width: 361px) and (max-width: 390px) {
+            /* Small phones - current mobile layout */
+            .summary-items {
+                grid-template-columns: 1fr 1fr;
+                gap: 3px;
+                column-gap: 4px;
+            }
+        }
+
+        @media (min-width: 391px) and (max-width: 430px) {
+            /* Standard phones - relaxed layout */
+            .summary-items {
+                grid-template-columns: 1fr 1fr;
+                gap: 3px;
+                column-gap: 5px;
+            }
+            .user-info-item {
+                min-width: 70px;
+            }
+        }
+
+        @media (min-width: 431px) and (max-width: 480px) {
+            /* Large phones - more space */
+            .summary-items {
+                grid-template-columns: 1fr 1fr;
+                gap: 4px;
+                column-gap: 6px;
+            }
+            .data-section {
+                padding: 12px;
+                margin-bottom: 15px;
+            }
+        }
+
+        @media (min-width: 481px) and (max-width: 768px) {
+            /* Tablets in portrait - hybrid layout */
+            .summary-items {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+                column-gap: 10px;
+            }
+            .user-info-tabs {
+                gap: 12px;
+                padding: 16px 12px;
+            }
+            .user-info-item {
+                min-width: 90px;
+                font-size: 0.85em;
+            }
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: var(--mira-cream-light);
+            border-radius: 6px;
+            border-left: 4px solid var(--mira-red);
+            border: 1px solid var(--mira-cream);
+            border-left-width: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .summary-item {
+                padding: 4px 5px;
+                font-size: 0.65em;
+                border-radius: 3px;
+                border-left-width: 2px;
+                min-width: 0;
+                overflow: hidden;
+                box-sizing: border-box;
+            }
+        }
+
+        .summary-label {
+            font-weight: 600;
+            color: var(--mira-red-dark);
+            min-width: 120px;
+        }
+
+        @media (max-width: 768px) {
+            .summary-label {
+                min-width: 0;
+                font-size: 0.65em;
+                font-weight: 700;
+                flex: 1;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        }
+
+        .summary-value {
+            color: var(--text-dark);
+            font-weight: 500;
+            text-align: right;
+        }
+
+        @media (max-width: 768px) {
+            .summary-value {
+                font-size: 0.65em;
+                font-weight: 600;
+                flex: 1;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                text-align: right;
+            }
+        }
+
+        /* Chat Analysis Styles */
+        .chat-analysis-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .chat-section, .analysis-section, .birth-details-section {
+            margin-bottom: 25px;
+        }
+
+        .chat-section h4, .analysis-section h4, .birth-details-section h4 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 8px;
+        }
+
+        .birth-details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .birth-detail-item {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 6px;
+            border-left: 4px solid var(--mira-red);
+            font-size: 0.9em;
+        }
+
+        .chat-messages {
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid var(--mira-cream);
+            border-radius: 10px;
+            padding: 15px;
+            background: white;
+            /* Custom scrollbar styling */
+            scrollbar-width: thin;
+            scrollbar-color: var(--mira-cream-dark) #f8f9fa;
+        }
+
+        /* Webkit scrollbar styling for better appearance */
+        .chat-messages::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: var(--mira-cream-dark);
+            border-radius: 4px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: var(--mira-red);
+        }
+
+        @media (max-width: 768px) {
+            .chat-messages {
+                max-height: 400px;
+                padding: 8px;
+                border-radius: 12px;
+                background: #fafafa;
+                border: none;
+                box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+            }
+        }
+
+        .chat-message {
+            margin-bottom: 15px;
+            padding: 12px;
+            border-radius: 10px;
+            border-left: 4px solid var(--mira-cream-dark);
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        @media (max-width: 768px) {
+            .chat-message {
+                margin-bottom: 8px;
+                padding: 8px 10px;
+                border-radius: 12px;
+                border-left-width: 3px;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            }
+        }
+
+        .chat-message.user {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-left-color: #2196f3;
+        }
+
+        .chat-message.user-message {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-left-color: #2196f3;
+        }
+
+        .chat-message.bot {
+            background: linear-gradient(135deg, var(--mira-cream-light) 0%, #fff5e6 100%);
+            border-left-color: var(--mira-red);
+        }
+
+        .chat-message.bot-message {
+            background: linear-gradient(135deg, var(--mira-cream-light) 0%, #fff5e6 100%);
+            border-left-color: var(--mira-red);
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .message-header {
+                margin-bottom: 6px;
+            }
+        }
+
+        .message-type {
+            font-weight: 600;
+            font-size: 0.9em;
+            color: var(--text-dark);
+        }
+
+        @media (max-width: 768px) {
+            .message-type {
+                font-size: 0.75em;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+        }
+
+        .message-time {
+            font-size: 0.8em;
+            color: var(--text-light);
+        }
+
+        @media (max-width: 768px) {
+            .message-time {
+                font-size: 0.7em;
+            }
+        }
+
+        .message-sequence {
+            font-size: 0.8em;
+            color: var(--text-light);
+            background: var(--mira-cream);
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .message-sequence {
+                font-size: 0.7em;
+                padding: 2px 5px;
+            }
+        }
+
+        .message-content {
+            color: var(--text-dark);
+            line-height: 1.5;
+            font-size: 0.95em;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        @media (max-width: 768px) {
+            .message-content {
+                font-size: 0.8em;
+                line-height: 1.5;
+                color: #333;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+            }
+        }
+
+        .message-more {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+
+        .chat-raw {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 0.9em;
+            color: #666;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .analysis-items {
+            display: grid;
+            gap: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .analysis-items {
+                gap: 8px;
+            }
+        }
+
+        .analysis-item {
+            background: var(--mira-cream-light);
+            border-radius: 10px;
+            padding: 15px;
+            border-left: 4px solid var(--mira-red);
+            border: 1px solid var(--mira-cream);
+            border-left-width: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .analysis-item {
+                padding: 10px 12px;
+                border-radius: 12px;
+                border-left-width: 3px;
+                background: linear-gradient(135deg, var(--mira-cream-light) 0%, #fff 100%);
+                box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            }
+        }
+
+        .analysis-label {
+            font-weight: 600;
+            color: var(--mira-red-dark);
+            display: block;
+            margin-bottom: 8px;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 0.95em;
+        }
+
+        @media (max-width: 768px) {
+            .analysis-label {
+                font-size: 0.75em;
+                margin-bottom: 5px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+        }
+
+        .analysis-value {
+            color: var(--text-dark);
+            line-height: 1.5;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid var(--mira-cream);
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 0.95em;
+        }
+
+        @media (max-width: 768px) {
+            .analysis-value {
+                padding: 8px 10px;
+                font-size: 0.8em;
+                line-height: 1.5;
+                color: #333;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+            }
+        }
+
+        .analysis-value.marking-marked {
+            border-left: 4px solid #4caf50;
+            background: #f1f8e9;
+        }
+
+        .analysis-value.marking-not_marked {
+            border-left: 4px solid #f44336;
+            background: #ffebee;
+        }
+
+        .analysis-value.marking-cant_judge {
+            border-left: 4px solid #ff9800;
+            background: #fff3e0;
+        }
+
+        .review-form {
+            background: #fff9e6;
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+
+        .review-form h3 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        /* Component Review Styles */
+        .component-review-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+        }
+
+        /* Overall Review Styles */
+        .overall-review-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+        }
+
+        .overall-review-section h4 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .overall-review-section p {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 0.95em;
+        }
+
+        .component-review-section h4 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+
+        .component-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .component-label {
+            display: block;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 10px;
+            font-size: 1em;
+        }
+
+        .review-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .review-btn {
+            padding: 10px 20px;
+            border: 2px solid var(--mira-cream-dark);
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-width: 120px;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .review-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .review-btn.correct {
+            border-color: #28a745;
+            color: #28a745;
+        }
+
+        .review-btn.correct:hover,
+        .review-btn.correct.active {
+            background: #28a745;
+            color: white;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .review-btn.incorrect {
+            border-color: var(--mira-red);
+            color: var(--mira-red);
+        }
+
+        .review-btn.incorrect:hover,
+        .review-btn.incorrect.active {
+            background: var(--mira-red);
+            color: white;
+            box-shadow: 0 4px 15px var(--shadow);
+        }
+
+        .review-btn.cant-judge {
+            border-color: #ffc107;
+            color: #856404;
+        }
+
+        .review-btn.cant-judge:hover,
+        .review-btn.cant-judge.active {
+            background: #ffc107;
+            color: #856404;
+            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+
+        .action-buttons .btn {
+            padding: 12px 24px;
+            font-size: 1em;
+            font-weight: 600;
+            min-width: 150px;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .checkbox-item label {
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .btn-primary {
+            background: var(--mira-red);
+            color: var(--mira-cream-light);
+            box-shadow: 0 4px 15px var(--shadow);
+        }
+
+        .btn-primary:hover {
+            background: var(--mira-red-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--shadow);
+        }
+
+        .btn-success {
+            background: var(--mira-red);
+            color: var(--mira-cream-light);
+            width: 100%;
+            box-shadow: 0 4px 15px var(--shadow);
+        }
+
+        .btn-success:hover {
+            background: var(--mira-red-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-success:disabled {
+            background: #ccc;
+            color: #666;
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-success:disabled:hover {
+            background: #ccc;
+            transform: none;
+        }
+
+        .btn-export {
+            background: var(--mira-red-light);
+            color: white;
+            margin-left: 10px;
+            box-shadow: 0 4px 15px var(--shadow);
+        }
+
+        .btn-export:hover {
+            background: var(--mira-red);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--mira-cream-dark);
+            color: var(--text-dark);
+            border: 2px solid var(--mira-red-light);
+        }
+        .btn-secondary:hover {
+            background: var(--mira-cream);
+            border-color: var(--mira-red);
+        }
+
+        .btn-refresh {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            padding: 12px 20px;
+            font-size: 0.95em;
+            min-width: 140px;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .btn-refresh:hover {
+            background: linear-gradient(135deg, #45a049, #3d8b40);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .btn-refresh:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 10px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn-refresh:disabled {
+            background: #cccccc;
+            color: #666666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Marking status removed */
+        .marking-cant-judge {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        /* Review Status Styles */
+        .card-status-badges {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .review-status {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.7em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            line-height: 1.3;
+            display: inline-flex;
+            align-items: center;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        .review-in-progress {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .review-completed {
+            background: #d1edff;
+            color: #0c5460;
+            border: 1px solid #b8daff;
+            padding: 5px 10px;
+            font-size: 0.7em;
+        }
+
+        .review-correct {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            padding: 5px 10px;
+            font-size: 0.7em;
+        }
+
+        .review-incorrect {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            padding: 5px 10px;
+            font-size: 0.7em;
+        }
+
+        .review-cant-judge {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+            padding: 5px 10px;
+            font-size: 0.7em;
+        }
+
+        /* Session card status-based styling */
+        .session-card.completed {
+            border-left: 5px solid #28a745;
+            border-left-color: #28a745;
+        }
+
+        .session-card.in_progress {
+            border-left: 5px solid #ffc107;
+            border-left-color: #ffc107;
+        }
+
+        .session-card.not_started {
+            border-left: 5px solid var(--mira-red);
+            border-left-color: var(--mira-red);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state svg {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔮 Mira Astrology Review System</h1>
+        </div>
+
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <h3 id="totalSessions">0</h3>
+                <p>Total Sessions</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="reviewedSessions">0</h3>
+                <p>Reviewed</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="pendingSessions">0</h3>
+                <p>Pending</p>
+            </div>
+        </div>
+
+            
+            <!-- Google Sheets Sync Buttons - HIDDEN -->
+            <div style="display: none; margin-top: 15px; padding-top: 15px; border-top: 2px solid var(--mira-cream-dark);">
+                <h3 style="margin-bottom: 10px; color: var(--mira-red);">📊 Google Sheets Sync</h3>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn" onclick="syncFromSheets()" style="background: #4CAF50;">⬇️ Sync FROM Sheets</button>
+                    <button class="btn" onclick="syncToSheets()" style="background: #2196F3;">⬆️ Sync TO Sheets</button>
+                    <button class="btn" onclick="fullSync()" style="background: #FF9800;">🔄 Full Sync</button>
+                    <button class="btn btn-secondary" onclick="checkSheetsStatus()" style="background: #9E9E9E;">📋 Status</button>
+                </div>
+                <div class="message" id="syncMessage" style="margin-top: 10px;"></div>
+            </div>
+        </div> -->
+
+
+        <div class="google-sheets-section">
+            <div class="sessions-grid" id="sessionsGrid">
+                <!-- Sessions will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Session Modal -->
+    <div id="sessionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Session Analysis</h2>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Session details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('JavaScript is loading...');
+        let allSessions = [];
+        let filteredSessions = [];
+        let isLoading = false;
+        let currentSession = null;
+        
+        // Frontend caching for performance
+        let statsCache = {
+            data: null,
+            lastUpdated: 0,
+            cacheDuration: 30000 // 30 seconds cache
+        };
+        
+        let sessionsCache = {
+            data: new Map(), // Cache by page
+            lastUpdated: 0,
+            cacheDuration: 60000 // 1 minute cache
+        };
+        
+        console.log('Variables initialized with caching');
+
+        function showMessage(elementId, message, type) {
+            const el = document.getElementById(elementId);
+            el.textContent = message;
+            el.className = `message ${type}`;
+            el.style.display = 'block';
+            setTimeout(() => {
+                el.style.display = 'none';
+            }, 5000);
+        }
+
+        function updateStatsDisplay(stats) {
+            document.getElementById('totalSessions').textContent = stats.total_sessions;
+            document.getElementById('reviewedSessions').textContent = stats.reviewed_sessions;
+            document.getElementById('pendingSessions').textContent = stats.pending_sessions;
+            // avgRating element removed - no longer updating
+        }
+
+        async function loadStats() {
+            try {
+                const currentTime = Date.now();
+                
+                // Always fetch fresh stats data (no caching for stats)
+                console.log('Fetching fresh stats data from Google Sheets');
+                const timestamp = Date.now();
+                const randomParam = Math.random().toString(36).substring(7);
+                const response = await fetch(`/stats?t=${timestamp}&r=${randomParam}&nocache=1&v=${timestamp}&force_fresh=1`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const stats = await response.json();
+                
+                // Cache the stats
+                statsCache.data = stats;
+                statsCache.lastUpdated = currentTime;
+                
+                updateStatsDisplay(stats);
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+                async function loadSessions() {
+            if (isLoading) return;
+            isLoading = true;
+            try {
+                // Show loading indicator
+                let sessionsGridElement = document.getElementById('sessionsGrid');
+                if (sessionsGridElement) {
+                    sessionsGridElement.innerHTML = `
+                        <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--mira-red);">
+                            <h3>🔄 Loading All Sessions...</h3>
+                            <p>Fetching all data from database</p>
+                        </div>
+                    `;
+                }
+                
+                // Multiple cache-busting strategies
+                const timestamp = new Date().getTime();
+                const random = Math.random().toString(36).substring(7);
+                const url = `/sessions?t=${timestamp}&r=${random}&nocache=1&v=${Date.now()}`;
+                
+                console.log('Loading all sessions from:', url);
+                
+                const response = await fetch(url, {
+                    method: 'GET',
+                    cache: 'no-cache',
+                    headers: {
+                        'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
+                        'Pragma': 'no-cache',
+                        'Expires': '0',
+                        'If-Modified-Since': '0',
+                        'If-None-Match': 'no-match-for-this'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('Raw response data:', data);
+                
+                if (!data || !data.sessions) {
+                    throw new Error('Invalid response format: missing sessions data');
+                }
+                
+                const sessions = data.sessions;
+                console.log(`Loaded ${sessions.length} sessions at ${new Date().toLocaleTimeString()}`);
+
+                let sessionsGrid = document.getElementById('sessionsGrid');
+
+                if (sessions.length === 0) {
+                    sessionsGrid.innerHTML = `
+                        <div style="grid-column: 1/-1; text-align: center; padding: 60px; color: #999;">
+                            <h3>No sessions found</h3>
+                            <p>Upload an Excel file to get started</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Store all sessions for filtering
+                allSessions = sessions;
+                
+                // Filter to show only unmarked sessions by default
+                const unmarkedSessions = sessions.filter(session => session.review_status === 'not_started' || !session.reviewed);
+                filteredSessions = unmarkedSessions;
+                console.log(`Loaded ${sessions.length} total sessions, showing ${unmarkedSessions.length} unmarked sessions`);
+                
+                // Render only unmarked session cards
+                renderSessions(unmarkedSessions, false);
+            } catch (error) {
+                console.error('Error loading sessions:', error);
+                console.error('Error details:', {
+                    message: error.message,
+                    stack: error.stack,
+                    name: error.name,
+                    toString: error.toString()
+                });
+                document.getElementById('sessionsGrid').innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 60px; color: #f44336;">
+                        <h3>Error loading sessions</h3>
+                        <p><strong>Error:</strong> ${error.message || error.toString() || 'Unknown error'}</p>
+                        <p><strong>Details:</strong> Check console for more information</p>
+                        <button onclick="loadSessions()" style="margin-top: 15px; padding: 10px 20px; background: var(--mira-red); color: white; border: none; border-radius: 5px; cursor: pointer;">
+                            🔄 Retry Loading
+                        </button>
+                    </div>
+                `;
+            } finally {
+                isLoading = false;
+            }
+        }
+
+        async function refreshData() {
+            const refreshBtn = document.getElementById('refreshBtn');
+            
+            try {
+                // Disable button and show loading state
+                refreshBtn.disabled = true;
+                refreshBtn.innerHTML = '🔄 Refreshing...';
+                
+                console.log('Refreshing data - clearing local reviews and syncing from Google Sheets');
+                
+                // Use the more thorough clear-and-sync approach to ensure fresh data
+                const syncResponse = await fetch('/api/clear-reviews-and-sync', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Cache-Control': 'no-cache'
+                    }
+                });
+                
+                if (!syncResponse.ok) {
+                    const errorText = await syncResponse.text();
+                    throw new Error(`Sync failed: ${syncResponse.status} - ${errorText}`);
+                }
+                
+                const syncResult = await syncResponse.json();
+                console.log('Sync result:', syncResult);
+                
+                if (!syncResult.success) {
+                    throw new Error(`Sync failed: ${syncResult.error || 'Unknown error'}`);
+                }
+                
+                // Clear frontend cache
+                statsCache.lastUpdated = 0;
+                
+                // Reload sessions and stats
+                await Promise.all([
+                    loadSessions(),
+                    loadStats()
+                ]);
+                
+                console.log('Data refresh completed successfully');
+                
+                // Show success feedback
+                refreshBtn.innerHTML = '✅ Refreshed!';
+                setTimeout(() => {
+                    refreshBtn.innerHTML = '🔄 Refresh Data';
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Error refreshing data:', error);
+                
+                // Show error feedback
+                refreshBtn.innerHTML = '❌ Error';
+                setTimeout(() => {
+                    refreshBtn.innerHTML = '🔄 Refresh Data';
+                }, 3000);
+                
+                alert('Failed to refresh data. Please try again or check the console for details.');
+            } finally {
+                // Re-enable button
+                refreshBtn.disabled = false;
+            }
+        }
+
+        function renderSessions(sessions, append = false) {
+            console.log(`renderSessions called with ${sessions.length} sessions, append: ${append}`);
+            let sessionsGrid = document.getElementById('sessionsGrid');
+            
+            if (!sessionsGrid) {
+                console.error('sessionsGrid element not found!');
+                return;
+            }
+            
+            if (!append && sessions.length === 0) {
+                console.log('No sessions to render, showing empty message');
+                sessionsGrid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 60px; color: #999;">
+                        <h3>No sessions match the current filters</h3>
+                        <p>Try adjusting your filter criteria</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const sessionsHTML = sessions.map(session => {
+                // Get review status display with overall status
+                let reviewText = 'Not Marked';
+                let reviewClass = 'review-not-started';
+                let reviewIcon = '⏳';
+                
+                if (session.review_status === 'not_started') {
+                    reviewText = 'Not Marked';
+                    reviewClass = 'review-not-started';
+                    reviewIcon = '⏳';
+                } else if (session.review_status === 'in_progress' || session.review_status === 'completed') {
+                    // Check if we have overall_status from existing_review
+                    const overallStatus = session.existing_review?.overall_status;
+                    
+                    if (overallStatus === 'correct') {
+                        reviewText = 'Marked - Correct';
+                        reviewClass = 'review-correct';
+                        reviewIcon = '✅';
+                    } else if (overallStatus === 'incorrect') {
+                        reviewText = 'Marked - Incorrect';
+                        reviewClass = 'review-incorrect';
+                        reviewIcon = '❌';
+                    } else if (overallStatus === 'cant-judge') {
+                        reviewText = "Marked - Can't Judge";
+                        reviewClass = 'review-cant-judge';
+                        reviewIcon = '🤷';
+                    } else {
+                        // Fallback for marked but no overall status yet
+                        reviewText = 'Marked';
+                        reviewClass = 'review-in-progress';
+                        reviewIcon = '✅';
+                    }
+                }
+                
+                const reviewInfo = { text: reviewText, class: reviewClass, icon: reviewIcon };
+
+                return `
+                    <div class="session-card ${session.review_status}" onclick="openSessionModal('${session.session_id}')">
+                        <div class="card-status-badges">
+                            <div class="review-status ${reviewInfo.class}">${reviewInfo.icon} ${reviewInfo.text}</div>
+                        </div>
+                        <div class="session-header">
+                            <div class="session-id">${session.session_id}</div>
+                            ${session.rating ? `<div class="session-rating">⭐ ${session.rating}</div>` : ''}
+                        </div>
+                        <div class="session-details">
+                            <div class="detail-item">
+                                <span class="detail-label">User ID:</span>
+                                <span class="detail-value">${session.user_id || 'N/A'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Age:</span>
+                                <span class="detail-value">${session.age || 'N/A'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Gender:</span>
+                                <span class="detail-value">${session.gender || 'N/A'}</span>
+                            </div>
+                        </div>
+                        <div class="dosha-indicators">
+                            ${session.manglik_dosha ? `<span class="dosha-badge ${session.manglik_dosha.toLowerCase() === 'yes' ? 'dosha-yes' : 'dosha-no'}">Manglik: ${session.manglik_dosha}</span>` : ''}
+                            ${session.pitra_dosha ? `<span class="dosha-badge ${session.pitra_dosha.toLowerCase() === 'yes' ? 'dosha-yes' : 'dosha-no'}">Pitra: ${session.pitra_dosha}</span>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            if (append) {
+                console.log('Appending sessions to existing content');
+                sessionsGrid.innerHTML += sessionsHTML;
+            } else {
+                console.log('Replacing sessions content');
+                sessionsGrid.innerHTML = sessionsHTML;
+            }
+            console.log(`Rendered sessions, final grid content length: ${sessionsGrid.innerHTML.length}`);
+        }
+
+
+        function renderDoshaCards(session) {
+            // Simple dosha display - only Manglik and Pitra
+            const manglikStatus = getDoshaEffectiveness(session.manglik_dosha);
+            const pitraStatus = getDoshaEffectiveness(session.pitra_dosha);
+
+            return `
+                <div class="dosha-card ${manglikStatus.isEffective ? 'negative' : 'positive'}">
+                    <div class="dosha-title">Manglik Dosha</div>
+                    <div class="dosha-status">${manglikStatus.text}</div>
+                </div>
+                <div class="dosha-card ${pitraStatus.isEffective ? 'negative' : 'positive'}">
+                    <div class="dosha-title">Pitra Dosha</div>
+                    <div class="dosha-status">${pitraStatus.isEffective ? 'Yes' : 'No'}</div>
+                </div>
+            `;
+        }
+
+        function getDoshaEffectiveness(doshaValue) {
+            if (!doshaValue) {
+                return { text: 'Not Effective', isEffective: false };
+            }
+            
+            const value = doshaValue.toString().toLowerCase().trim();
+            
+            // Check for ineffective indicators
+            if (value.includes('ineffective') || value.includes('not effective')) {
+                return { text: 'Ineffective', isEffective: false };
+            }
+            
+            // Check for not effective/absent indicators
+            if (value.includes('not present') || value.includes('absent') || 
+                value === 'no' || value === 'false') {
+                return { text: 'Not Effective', isEffective: false };
+            }
+            
+            // Check for effective indicators
+            if (value.includes('effective') || value.includes('yes') || value.includes('present') || 
+                value.includes('mild') || value.includes('severe') || value.includes('high') || 
+                value.includes('medium') || value.includes('low') || value.includes('partial') ||
+                value === 'true' || value.includes('found')) {
+                return { text: 'Effective', isEffective: true };
+            }
+            
+            // Default to not effective if unclear
+            return { text: 'Not Effective', isEffective: false };
+        }
+
+        function isDoshaPresent(doshaValue) {
+            if (!doshaValue) return false;
+            const value = doshaValue.toString().toLowerCase().trim();
+            
+            // Check for "not present" or "no" first
+            if (value.includes('not present') || value.includes('not effective') || 
+                value.includes('absent') || value === 'no' || value === 'false') {
+                return false;
+            }
+            
+            // Check for present indicators
+            return value.includes('yes') || value.includes('present') || value.includes('effective') || 
+                   value.includes('mild') || value.includes('severe') || value.includes('high') || 
+                   value.includes('medium') || value.includes('low') || value.includes('partial') ||
+                   value === 'true' || value.includes('found');
+        }
+
+        function extractBirthDetails(chatData) {
+            const details = { name: '', dob: '', tob: '', city: '' };
+            
+            if (!chatData || typeof chatData !== 'string') {
+                return details;
+            }
+            
+            try {
+                // Parse the JSON chat data to find birth details
+                const chatMessages = JSON.parse(`[${chatData.replace(/}\s*{/g, '},{')}]`);
+                
+                for (const message of chatMessages) {
+                    if (message.user) {
+                        const userText = message.user;
+                        
+                        // Extract Name
+                        const nameMatch = userText.match(/Name:\s*([^\n\r]+)/i);
+                        if (nameMatch) details.name = nameMatch[1].trim();
+                        
+                        // Extract Date of Birth
+                        const dobMatch = userText.match(/Date of Birth:\s*([^\n\r]+)/i);
+                        if (dobMatch) details.dob = dobMatch[1].trim();
+                        
+                        // Extract Time of Birth
+                        const tobMatch = userText.match(/Time of Birth:\s*([^\n\r]+)/i);
+                        if (tobMatch) details.tob = tobMatch[1].trim();
+                        
+                        // Extract Birth City
+                        const cityMatch = userText.match(/Birth City:\s*([^\n\r]+)/i);
+                        if (cityMatch) details.city = cityMatch[1].trim();
+                        
+                        // If we found details, we can break
+                        if (details.name || details.dob || details.tob || details.city) {
+                            break;
+                        }
+                    }
+                }
+            } catch (e) {
+                console.log('Could not parse birth details from chat:', e);
+            }
+            
+            return details;
+        }
+
+        function parseChatMessages(chatText) {
+            if (!chatText || chatText.trim() === '' || chatText === 'N/A') {
+                return '<div class="chat-message">No chat data available</div>';
+            }
+
+            try {
+                // Handle JSON format: {"user": "...", "bot": "..."}
+                let chatHtml = '';
+                let messageCount = 0;
+                
+                // Better parsing approach - split by },{ and reconstruct
+                let jsonObjects = [];
+                
+                // Clean the chat text first - escape unescaped newlines and other control characters
+                let cleanedChatText = chatText
+                    .replace(/\n/g, '\\n')  // Escape newlines
+                    .replace(/\r/g, '\\r')  // Escape carriage returns
+                    .replace(/\t/g, '\\t'); // Escape tabs
+                
+                // First, try to parse as a complete JSON array
+                try {
+                    const arrayFormat = `[${cleanedChatText}]`;
+                    jsonObjects = JSON.parse(arrayFormat);
+                    console.log('Successfully parsed as JSON array:', jsonObjects.length, 'messages');
+                } catch (e) {
+                    console.log('Array parsing failed, trying split approach:', e.message);
+                    
+                    // If that fails, split by },{ pattern and parse individually
+                    const parts = cleanedChatText.split(/},\s*{/);
+                    
+                    for (let i = 0; i < parts.length; i++) {
+                        let part = parts[i].trim();
+                        
+                        // Add missing braces
+                        if (i === 0 && !part.startsWith('{')) part = '{' + part;
+                        if (i === parts.length - 1 && !part.endsWith('}')) part = part + '}';
+                        if (i > 0 && i < parts.length - 1) part = '{' + part + '}';
+                        if (i > 0 && !part.startsWith('{')) part = '{' + part;
+                        if (i < parts.length - 1 && !part.endsWith('}')) part = part + '}';
+                        
+                        try {
+                            const messageObj = JSON.parse(part);
+                            jsonObjects.push(messageObj);
+                        } catch (parseError) {
+                            console.log('Could not parse part:', part.substring(0, 50), parseError.message);
+                        }
+                    }
+                }
+                
+                // Process all parsed objects
+                jsonObjects.forEach((messageObj, index) => {
+                    if (messageObj.user) {
+                        messageCount++;
+                        // Convert escaped newlines back to HTML breaks and preserve formatting
+                        const userMessage = messageObj.user
+                            .replace(/\\n/g, '<br>')  // Convert escaped newlines to breaks
+                            .replace(/\n/g, '<br>');   // Convert any remaining newlines
+                        
+                        console.log(`User message #${messageCount}:`, messageObj.user.substring(0, 100));
+                        
+                        chatHtml += `
+                            <div class="chat-message user-message">
+                                <div class="message-header">
+                                    <span class="message-type">👤 User</span>
+                                    <span class="message-sequence">#${messageCount}</span>
+                                </div>
+                                <div class="message-content">${userMessage}</div>
+                            </div>
+                        `;
+                    }
+                    
+                    if (messageObj.bot) {
+                        messageCount++;
+                        // Convert escaped newlines back to HTML breaks and preserve formatting
+                        const botMessage = messageObj.bot
+                            .replace(/\\n/g, '<br>')  // Convert escaped newlines to breaks
+                            .replace(/\n/g, '<br>');   // Convert any remaining newlines
+                        
+                        console.log(`Bot message #${messageCount}:`, messageObj.bot.substring(0, 100));
+                        
+                        chatHtml += `
+                            <div class="chat-message bot-message">
+                                <div class="message-header">
+                                    <span class="message-type">🤖 Bot</span>
+                                    <span class="message-sequence">#${messageCount}</span>
+                                </div>
+                                <div class="message-content">${botMessage}</div>
+                            </div>
+                        `;
+                    }
+                });
+                
+                return chatHtml || '<div class="chat-message">No valid chat messages found</div>';
+                
+            } catch (error) {
+                console.error('Error parsing chat messages:', error);
+                return '<div class="chat-message">Error parsing chat data</div>';
+            }
+        }
+
+        function renderKundliDetails(session) {
+            let kundliData = session.kundli;
+            
+            // Parse kundli data if it's a string
+            if (typeof kundliData === 'string') {
+                try {
+                    kundliData = JSON.parse(kundliData);
+                } catch (e) {
+                    console.error('Error parsing kundli data:', e);
+                    return `<div class="value">Error parsing kundli data</div>`;
+                }
+            }
+            
+            if (kundliData && Array.isArray(kundliData)) {
+                return `
+                    <div class="kundli-houses">
+                        <h4>🏠 Houses & Planets</h4>
+                        <div class="houses-grid">
+                            ${kundliData.map((house, index) => {
+                                const houseData = house.value || house;
+                                const planets = houseData.planet || [];
+                                const planetNames = planets.map(p => p.value || p).join(', ');
+                                
+                                return `
+                                    <div class="house-item">
+                                        <div class="house-number">${houseData.sign_name || `House ${index + 1}`}</div>
+                                        <div class="house-sign">${houseData.sign || houseData.sign_name || `House ${index + 1}`}</div>
+                                        <div class="house-planets">${planetNames || 'No planets'}</div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            } else {
+                return `<div class="value">${session.kundli || 'N/A'}</div>`;
+            }
+        }
+
+        function renderPlanetaryPositions(positions) {
+            if (!positions || Object.keys(positions).length === 0) return '';
+
+            return `
+                <div class="planetary-positions">
+                    <h4>Planetary Positions</h4>
+                    <div class="planets-grid">
+                        ${Object.entries(positions).map(([planet, data]) => `
+                            <div class="planet-card">
+                                <div class="planet-name">${planet}</div>
+                                <div class="planet-sign">${data.sign || 'N/A'}</div>
+                                <div class="planet-house">House ${data.house || 'N/A'}</div>
+                                ${data.retrograde ? '<div class="retrograde-indicator">R</div>' : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+
+        function getDetailedHouseAnalysis(kundli) {
+            if (!kundli || !kundli.houses) {
+                return '<div class="house-item">No kundli house data available</div>';
+            }
+
+            const houses = kundli.houses;
+            const houseNames = {
+                'house_1': '1st House (Ascendant/Lagna)',
+                'house_2': '2nd House (Wealth/Family)',
+                'house_3': '3rd House (Siblings/Courage)',
+                'house_4': '4th House (Home/Mother)',
+                'house_5': '5th House (Children/Education)',
+                'house_6': '6th House (Health/Enemies)',
+                'house_7': '7th House (Marriage/Partnership)',
+                'house_8': '8th House (Longevity/Transformation)',
+                'house_9': '9th House (Fortune/Religion)',
+                'house_10': '10th House (Career/Status)',
+                'house_11': '11th House (Gains/Friends)',
+                'house_12': '12th House (Loss/Spirituality)'
+            };
+
+            return `
+                <div class="houses-grid">
+                    ${Object.entries(houses).map(([houseKey, houseData]) => {
+                        const houseName = houseNames[houseKey] || houseKey;
+                        const houseNumber = houseKey.replace('house_', '');
+                        
+                        return `
+                            <div class="house-detail-card">
+                                <div class="house-header">
+                                    <div class="house-number">${houseNumber}</div>
+                                    <div class="house-title">${houseName}</div>
+                                </div>
+                                <div class="house-content">
+                                    <div class="house-data-row">
+                                        <span class="house-data-label">Sign:</span>
+                                        <span class="house-data-value">${houseData.sign || 'N/A'}</span>
+                                    </div>
+                                    <div class="house-data-row">
+                                        <span class="house-data-label">Lord:</span>
+                                        <span class="house-data-value">${houseData.lord || 'N/A'}</span>
+                                    </div>
+                                    <div class="house-data-row">
+                                        <span class="house-data-label">Planets:</span>
+                                        <span class="house-data-value">
+                                            ${houseData.planets && houseData.planets.length > 0 
+                                                ? houseData.planets.join(', ') 
+                                                : 'Empty'}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        function getSummaryDetails(summary) {
+            try {
+                // Parse JSON string if needed
+                let summaryData = summary;
+                if (typeof summary === 'string') {
+                    summaryData = JSON.parse(summary);
+                }
+                
+                if (!summaryData || Object.keys(summaryData).length === 0) {
+                    return '<div class="summary-item">No summary data available</div>';
+                }
+                
+                console.log('Summary data:', summaryData);
+
+            return `
+                <div class="summary-grid">
+                    <div class="summary-category">
+                        <h4>👤 Personal Details</h4>
+                        <div class="summary-items">
+                            <div class="summary-item">
+                                <span class="summary-label">Nakshatra:</span>
+                                <span class="summary-value">${summaryData.naksahtra || summaryData.nakshatra || 'N/A'}</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Nakshatra Lord:</span>
+                                <span class="summary-value">${summaryData.naksahtralord || summaryData.nakshatra_lord || 'N/A'}</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Varna:</span>
+                                <span class="summary-value">${summaryData.varna || 'N/A'}</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Paya:</span>
+                                <span class="summary-value">${summaryData.paya || 'N/A'}</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Name Alphabet:</span>
+                                <span class="summary-value">${summaryData.name_alphabet || 'N/A'}</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Tatva:</span>
+                                <span class="summary-value">${summaryData.tatva || 'N/A'}</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Charan:</span>
+                                <span class="summary-value">${summaryData.charan || 'N/A'}</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Gan:</span>
+                                <span class="summary-value">${summaryData.gan || 'N/A'}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="summary-category">
+                        <h4>🔮 Astrological Info</h4>
+                        <div class="summary-items">
+                            <div class="summary-item">
+                                <span class="summary-label">Sign:</span>
+                                <span class="summary-value">${summaryData.sign || 'N/A'}</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Sign Lord:</span>
+                                <span class="summary-value">${summaryData.sign_lord || summaryData.signlord || summaryData.signLord || summaryData['sign lord'] || 'N/A'}</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Ascendant:</span>
+                                <span class="summary-value">${summaryData.ascendant || 'N/A'}</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Ascendant Lord:</span>
+                                <span class="summary-value">${summaryData.ascendant_lord || 'N/A'}</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Karan:</span>
+                                <span class="summary-value">${summaryData.karan || 'N/A'}</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Yog:</span>
+                                <span class="summary-value">${summaryData.yog || 'N/A'}</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Yunja:</span>
+                                <span class="summary-value">${summaryData.yunja || 'N/A'}</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Tithi:</span>
+                                <span class="summary-value">${summaryData.tithi || 'N/A'}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="summary-category">
+                        <h4>📋 Additional Details</h4>
+                        <div class="summary-items">
+                            <div class="summary-item">
+                                <span class="summary-label">Vashya:</span>
+                                <span class="summary-value">${summaryData.vashya || 'N/A'}</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Yoni:</span>
+                                <span class="summary-value">${summaryData.yoni || 'N/A'}</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Nadi:</span>
+                                <span class="summary-value">${summaryData.nadi || 'N/A'}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            } catch (error) {
+                console.error('Error parsing summary data:', error);
+                return '<div class="summary-item">Error displaying summary data</div>';
+            }
+        }
+
+        function getChatAnalysisContent(chatData, saurabhAnalysis, originalMarking) {
+            let content = '';
+            
+            console.log('getChatAnalysisContent called with:', {
+                chatDataType: typeof chatData,
+                chatDataLength: chatData ? chatData.length : 0,
+                chatDataPreview: (chatData && typeof chatData === 'string') ? chatData.substring(0, 100) : 'null/non-string'
+            });
+
+            // No separate birth details section - show everything in chat
+
+            // Restore chat conversation display
+            if (chatData && typeof chatData === 'string') {
+                content += `
+                    <div class="chat-section">
+                        <div class="chat-messages">
+                            ${parseChatMessages(chatData)}
+                        </div>
+                    </div>
+                `;
+            } else {
+                content += `
+                    <div class="chat-section">
+                        <div class="chat-messages">
+                            <div class="chat-message">No chat data available</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Analysis section - REMOVED per user request
+            /*
+            content += `
+                <div class="analysis-section">
+                    <h4>📊 Analysis & Marking</h4>
+                    <div class="analysis-items">
+                        <div class="analysis-item">
+                            <span class="analysis-label">Saurabh Analysis:</span>
+                            <div class="analysis-value">${saurabhAnalysis || 'N/A'}</div>
+                        </div>
+                        <div class="analysis-item">
+                            <span class="analysis-label">Original Marking:</span>
+                            <div class="analysis-value marking-${(originalMarking || '').toLowerCase().replace(/\s+/g, '_')}">${originalMarking || 'N/A'}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            */
+
+            return content;
+        }
+
+        async function openSessionModal(sessionId) {
+            try {
+                console.log('Opening session modal for:', sessionId);
+                const response = await fetch(`/session/${sessionId}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const session = await response.json();
+                console.log('Session data received:', session);
+                console.log('Parsed astro data:', session.parsed_astro);
+                if (session.parsed_astro && session.parsed_astro.dasha) {
+                    console.log('Dasha data:', session.parsed_astro.dasha);
+                }
+
+                currentSession = session;
+
+                const modalTitle = document.getElementById('modalTitle');
+                const modalBody = document.getElementById('modalBody');
+                
+                if (!modalTitle) {
+                    throw new Error('Modal title element not found');
+                }
+                if (!modalBody) {
+                    throw new Error('Modal body element not found');
+                }
+                
+                modalTitle.textContent = `Session Analysis: ${session.session_id}`;
+                
+                // Helper function to get gender class
+                const getGenderClass = (gender) => {
+                    if (!gender) return '';
+                    return gender.toLowerCase() === 'male' ? 'gender-male' : 'gender-female';
+                };
+
+                // Helper function to determine dosha status
+                const getDoshaStatus = (doshaValue) => {
+                    if (!doshaValue) return { status: 'Unknown', class: 'positive' };
+                    const value = doshaValue.toLowerCase();
+                    if (value.includes('no') || value === 'absent') {
+                        return { status: 'No Dosha', class: 'positive' };
+                    } else if (value.includes('yes') || value.includes('present') || value.includes('partial') || 
+                              value.includes('effective') || value.includes('mild') || value.includes('severe') || 
+                              value.includes('high') || value.includes('medium') || value.includes('low')) {
+                        return { status: doshaValue, class: 'negative' };
+                    } else {
+                        return { status: doshaValue, class: 'positive' };
+                    }
+                };
+
+                const manglikStatus = getDoshaStatus(session.manglik_dosha);
+                const pitraStatus = getDoshaStatus(session.pitra_dosha);
+
+                // Generate dosha cards content
+                let doshaCardsContent = '';
+                try {
+                    doshaCardsContent = renderDoshaCards(session);
+                } catch (e) {
+                    console.error('Error rendering dosha cards:', e);
+                    doshaCardsContent = `<div class="dosha-card positive"><div class="dosha-title">Error</div><div class="dosha-status">Unable to load dosha data</div></div>`;
+                }
+                
+                // Generate kundli details content
+                let kundliDetailsContent = '';
+                try {
+                    kundliDetailsContent = renderKundliDetails(session);
+                } catch (e) {
+                    console.error('Error rendering kundli details:', e);
+                    kundliDetailsContent = `<div class="value">Unable to load kundli data</div>`;
+                }
+                
+                // Generate dasha cards using parsed data if available
+                let dashaCardsContent = '';
+                if (session.parsed_astro && session.parsed_astro.dasha) {
+                    const parsedDasha = session.parsed_astro.dasha;
+                    const dashaTypes = [
+                        { type: 'Major Dasha', data: parsedDasha.major, label: 'Main Period' },
+                        { type: 'Minor Dasha', data: parsedDasha.minor, label: 'Sub Period' },
+                        { type: 'Sub Minor Dasha', data: parsedDasha.sub_minor, label: 'Current Phase' }
+                    ];
+                    
+                    dashaCardsContent = dashaTypes.map(dasha => {
+                        if (!dasha.data || !dasha.data.planet || dasha.data.planet === 'N/A') {
+                            return `
+                                <div class="dasha-card">
+                                    <div class="dasha-type">${dasha.type}</div>
+                                    <div class="dasha-planet">N/A</div>
+                                    <div class="dasha-time">${dasha.label}</div>
+                                </div>
+                            `;
+                        }
+                        
+                        // Show full date and time information
+                        let timePeriod = dasha.label;
+                        if (dasha.data.start && dasha.data.end) {
+                            timePeriod = `${dasha.data.start} to ${dasha.data.end}`;
+                        }
+                        
+                        return `
+                            <div class="dasha-card">
+                                <div class="dasha-type">${dasha.type}</div>
+                                <div class="dasha-planet">${dasha.data.planet}</div>
+                                <div class="dasha-time">${timePeriod}</div>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    // Fallback to manual parsing
+                    dashaCardsContent = [
+                        { type: 'Major Dasha', value: session.major_dasha, label: 'Main Period' },
+                        { type: 'Minor Dasha', value: session.minor_dasha, label: 'Sub Period' },
+                        { type: 'Sub Minor Dasha', value: session.sub_minor_dasha, label: 'Current Phase' }
+                    ].map(dasha => {
+                        if (!dasha.value || dasha.value === 'N/A') {
+                            return `
+                                <div class="dasha-card">
+                                    <div class="dasha-type">${dasha.type}</div>
+                                    <div class="dasha-planet">N/A</div>
+                                    <div class="dasha-time">${dasha.label}</div>
+                                </div>
+                            `;
+                        }
+                        
+                        // Try to parse JSON first
+                        try {
+                            const jsonData = JSON.parse(dasha.value);
+                            if (jsonData.planet) {
+                                const period = jsonData.start && jsonData.end ? 
+                                    `${jsonData.start} to ${jsonData.end}` : dasha.label;
+                                return `
+                                    <div class="dasha-card">
+                                        <div class="dasha-type">${dasha.type}</div>
+                                        <div class="dasha-planet">${jsonData.planet}</div>
+                                        <div class="dasha-time">${period}</div>
+                                    </div>
+                                `;
+                            }
+                        } catch (e) {
+                            // Not JSON, try text parsing
+                        }
+                        
+                        // Parse planet and timing from formats like "Venus (2020-2040)" or just "Venus"
+                        const match = dasha.value.match(/^([^(]+)(?:\s*\(([^)]+)\))?/);
+                        const planet = match ? match[1].trim() : dasha.value;
+                        const timing = match && match[2] ? match[2].trim() : dasha.label;
+                        
+                        return `
+                            <div class="dasha-card">
+                                <div class="dasha-type">${dasha.type}</div>
+                                <div class="dasha-planet">${planet}</div>
+                                <div class="dasha-time">${timing}</div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+
+                modalBody.innerHTML = `
+                    <!-- User Information Horizontal Tabs -->
+                    <div class="user-info-tabs">
+                        <div class="user-info-item">
+                            <div class="user-info-label">User ID</div>
+                            <div class="user-info-value">${session.user_id || 'N/A'}</div>
+                        </div>
+                        <div class="user-info-item">
+                            <div class="user-info-label">Age</div>
+                            <div class="user-info-value">${session.age || 'N/A'}</div>
+                        </div>
+                        <div class="user-info-item">
+                            <div class="user-info-label">Gender</div>
+                            <div class="user-info-value ${getGenderClass(session.gender)}">${session.gender || 'N/A'}</div>
+                        </div>
+                        <div class="user-info-item" style="display: none;">
+                            <div class="user-info-label">Rating</div>
+                            <div class="user-info-value rating">⭐ ${session.rating || 'N/A'}</div>
+                        </div>
+                    </div>
+
+                    <!-- Summary Section -->
+                    <div class="data-section">
+                        <h3>📄 Astrological Summary</h3>
+                        <div class="summary-details">
+                            ${getSummaryDetails(session.summary)}
+                        </div>
+                    </div>
+
+                    <!-- Dasha Information Grid -->
+                    <div class="data-section">
+                        <h3>🔮 Dasha Analysis</h3>
+                        <div class="dasha-grid">
+                            ${dashaCardsContent}
+                        </div>
+                    </div>
+
+                    <!-- Dosha Status Grid -->
+                    <div class="data-section">
+                        <h3>⚠️ Dosha Analysis</h3>
+                        <div class="dosha-grid">
+                            ${doshaCardsContent}
+                        </div>
+                    </div>
+
+                    <!-- Kundli Information -->
+                    <div class="data-section">
+                        <h3>📊 Kundli Details</h3>
+                        ${kundliDetailsContent}
+                    </div>
+
+                    <!-- Kundli Chart Visualization - Hidden for optimization -->
+                    <div class="data-section" style="display: none;">
+                        <h3>🎯 Birth Chart (Kundli)</h3>
+                        <div class="chart-container">
+                            <div class="chart-display">
+                                <img id="kundliChart" src="/kundli-chart/${session.session_id}" alt="Kundli Chart" style="max-width: 100%; height: auto; border: 2px solid #ddd; border-radius: 10px;" onerror="this.style.display='none'; document.getElementById('chartError').style.display='block';">
+                                <div id="chartError" style="display: none; text-align: center; padding: 40px; color: #666; border: 2px dashed #ddd; border-radius: 10px;">
+                                    <p>📊 Chart visualization not available</p>
+                                    <p style="font-size: 0.9em; margin-top: 10px;">Kundli data may be in text format or unavailable</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Kundli House Data - HIDDEN -->
+                    <!--
+                    <div class="data-section">
+                        <h3>🏠 Detailed House Analysis</h3>
+                        <div class="house-analysis-container">
+                            ${getDetailedHouseAnalysis(session.parsed_astro?.kundli || {})}
+                        </div>
+                    </div>
+                    -->
+
+                    <!-- Chat & Analysis Section -->
+                    <div class="data-section">
+                        <h3>💬 Chat & Analysis</h3>
+                        <div class="chat-analysis-container">
+                            ${getChatAnalysisContent(session.chat, session.saurabh_analysis, session.original_marking)}
+                        </div>
+                    </div>
+
+                    <div class="review-form">
+                        <h3>✍️ Review Analysis</h3>
+                        <div class="message" id="reviewMessage"></div>
+                        
+                        <!-- Overall Review Section -->
+                        <div class="overall-review-section">
+                            <h4>📋 Overall Analysis Review</h4>
+                            <p>Please review all the data (Kundli, Dasha, Dosha, Chat, Summary) and provide your overall assessment:</p>
+                            
+                            <div class="review-buttons" data-component="overall">
+                                <button class="review-btn correct" data-status="correct" onclick="setOverallReview('correct')">✅ Correct</button>
+                                <button class="review-btn incorrect" data-status="incorrect" onclick="setOverallReview('incorrect')">❌ Not Correct</button>
+                                <button class="review-btn cant-judge" data-status="cant-judge" onclick="setOverallReview('cant-judge')">🤷 Can't Judge</button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Additional Comments:</label>
+                            <textarea id="comments" placeholder="Enter any additional feedback, corrections, or notes..."></textarea>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="action-buttons">
+                            <button id="analysisDoneBtn" class="btn btn-success" onclick="analysisComplete()" disabled>✅ Analysis Done</button>
+                        </div>
+                    </div>
+                `;
+
+                // Initialize review form with existing data if available
+                setTimeout(() => {
+                    console.log('Initializing review form...');
+                    console.log('Session data:', session);
+                    console.log('Existing review:', session.existing_review);
+                    
+                    if (session.existing_review) {
+                        console.log('Loading existing review:', session.existing_review);
+                        
+                        // Set the overall review status
+                        if (session.existing_review.overall_status) {
+                            console.log('Setting overall status:', session.existing_review.overall_status);
+                            setOverallReview(session.existing_review.overall_status);
+                            overallReviewStatus = session.existing_review.overall_status;
+                        }
+                        
+                        // Set comments if they exist
+                        const commentsField = document.getElementById('comments');
+                        if (commentsField && session.existing_review.comments) {
+                            console.log('Setting comments:', session.existing_review.comments);
+                            commentsField.value = session.existing_review.comments;
+                        }
+                        
+                        console.log('Review form initialized with existing data');
+                    } else {
+                        console.log('No existing review found for session:', session.session_id);
+                        // Reset the form if no review exists
+                        document.querySelectorAll('.review-btn').forEach(btn => btn.classList.remove('active'));
+                        const commentsField = document.getElementById('comments');
+                        if (commentsField) commentsField.value = '';
+                        overallReviewStatus = null;
+                    }
+                }, 100); // Small delay to ensure DOM is ready
+
+                console.log('Setting modal display to block');
+                document.getElementById('sessionModal').style.display = 'block';
+                console.log('Modal should now be visible');
+
+            } catch (error) {
+                console.error('Error loading session:', error);
+                alert('Error loading session: ' + error.message);
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('sessionModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside of it
+        window.onclick = function(event) {
+            const modal = document.getElementById('sessionModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        async function loadSession(sessionId) {
+            try {
+                const response = await fetch(`/session/${sessionId}`);
+                const session = await response.json();
+
+                currentSession = session;
+
+                const panel = document.getElementById('reviewPanel');
+                panel.innerHTML = `
+                    <h2>📊 Session Review: ${session.session_id}</h2>
+
+                    <div class="data-section">
+                        <h3>👤 User Information</h3>
+                        <div class="data-row">
+                            <label>User ID:</label>
+                            <div class="value">${session.user_id || 'N/A'}</div>
+                        </div>
+                        <div class="data-row">
+                            <label>Age:</label>
+                            <div class="value">${session.age || 'N/A'}</div>
+                        </div>
+                        <div class="data-row">
+                            <label>Gender:</label>
+                            <div class="value">${session.gender || 'N/A'}</div>
+                        </div>
+                        <div class="data-row" style="display: none;">
+                            <label>Rating:</label>
+                            <div class="value">${session.rating || 'N/A'}</div>
+                        </div>
+                    </div>
+
+                    <div class="data-section">
+                        <h3>🔮 Kundli Data</h3>
+                        <div class="data-row">
+                            <label>Kundli:</label>
+                            <div class="value">${session.kundli || 'N/A'}</div>
+                        </div>
+                        <div class="data-row">
+                            <label>Major Dasha:</label>
+                            <div class="value">${session.major_dasha || 'N/A'}</div>
+                        </div>
+                        <div class="data-row">
+                            <label>Minor Dasha:</label>
+                            <div class="value">${session.minor_dasha || 'N/A'}</div>
+                        </div>
+                        <div class="data-row">
+                            <label>Sub Minor Dasha:</label>
+                            <div class="value">${session.sub_minor_dasha || 'N/A'}</div>
+                        </div>
+                        <div class="data-row">
+                            <label>Manglik Dosha:</label>
+                            <div class="value">${session.manglik_dosha || 'N/A'}</div>
+                        </div>
+                        <div class="data-row">
+                            <label>Pitra Dosha:</label>
+                            <div class="value">${session.pitra_dosha || 'N/A'}</div>
+                        </div>
+                    </div>
+
+                    <!-- Chat & Analysis Section -->
+                    <div class="data-section">
+                        <h3>💬 Chat & Analysis</h3>
+                        <div class="chat-analysis-container">
+                            ${getChatAnalysisContent(session.chat, session.saurabh_analysis, session.original_marking)}
+                        </div>
+                    </div>
+
+                    <div class="review-form">
+                        <h3>✍️ Review Analysis</h3>
+                        <div class="message" id="reviewMessage"></div>
+                        
+                        <!-- Overall Review Section -->
+                        <div class="overall-review-section">
+                            <h4>📋 Overall Analysis Review</h4>
+                            <p>Please review all the data (Kundli, Dasha, Dosha, Chat, Summary) and provide your overall assessment:</p>
+                            
+                            <div class="review-buttons" data-component="overall">
+                                <button class="review-btn correct" data-status="correct" onclick="setOverallReview('correct')">✅ Correct</button>
+                                <button class="review-btn incorrect" data-status="incorrect" onclick="setOverallReview('incorrect')">❌ Not Correct</button>
+                                <button class="review-btn cant-judge" data-status="cant-judge" onclick="setOverallReview('cant-judge')">🤷 Can't Judge</button>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label>Additional Comments:</label>
+                            <textarea id="comments" placeholder="Enter any additional feedback, corrections, or notes..."></textarea>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="action-buttons">
+                            <button id="analysisDoneBtn" class="btn btn-success" onclick="analysisComplete()" disabled>✅ Analysis Done</button>
+                        </div>
+                    </div>
+                `;
+
+                // Highlight active session
+                document.querySelectorAll('.session-item').forEach(item => {
+                    item.classList.remove('active');
+                    if (item.textContent.includes(sessionId)) {
+                        item.classList.add('active');
+                    }
+                });
+
+            } catch (error) {
+                console.error('Error loading session:', error);
+            }
+        }
+
+        // Store review data
+        let overallReviewStatus = null;
+
+        function setOverallReview(status) {
+            // Update the overall review status
+            overallReviewStatus = status;
+            console.log('Setting overall review status to:', status);
+            
+            // Update button states in both forms (modal and main view)
+            document.querySelectorAll(`[data-component="overall"] .review-btn`).forEach(btn => {
+                // Remove active class from all buttons
+                btn.classList.remove('active');
+                
+                // Add active class to the selected button
+                if (btn.dataset.status === overallReviewStatus) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Enable the Analysis Done button since a selection has been made
+            const analysisDoneBtn = document.getElementById('analysisDoneBtn');
+            if (analysisDoneBtn) {
+                analysisDoneBtn.disabled = false;
+                analysisDoneBtn.style.opacity = '1';
+                analysisDoneBtn.style.cursor = 'pointer';
+            }
+        }
+
+        // Upload functionality removed.
+
+        async function analysisComplete() {
+            // Check if a review status has been selected
+            if (!overallReviewStatus) {
+                alert('Please select a review status (Correct/Not Correct/Can\'t Judge) before completing the analysis.');
+                return;
+            }
+            
+            const commentsValue = document.getElementById('comments').value;
+            const submitData = {
+                session_id: currentSession.session_id,
+                astrologer_name: 'System Reviewer',
+                overall_status: overallReviewStatus,
+                comments: commentsValue,
+                status: 'completed'
+            };
+            
+            console.log('Completing analysis with data:', submitData);
+
+            try {
+                const response = await fetch('/review', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(submitData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showMessage('reviewMessage', 'Analysis completed successfully! ✅', 'success');
+                    
+                    // Update the current session with the saved review data
+                    currentSession.existing_review = {
+                        overall_status: overallReviewStatus,
+                        comments: commentsValue,
+                        astrologer_name: 'System Reviewer'
+                    };
+                    currentSession.review_status = 'completed';
+                    
+                    // Refresh the sessions list, stats, and close modal to return to main page
+                    setTimeout(() => {
+                        loadSessions();
+                        loadStats();
+                        closeModal();
+                    }, 1500);
+                } else {
+                    showMessage('reviewMessage', result.error || 'Failed to complete analysis', 'error');
+                }
+            } catch (error) {
+                showMessage('reviewMessage', 'Error completing analysis: ' + error.message, 'error');
+            }
+        }
+
+
+
+        // Load initial data with error handling and retry mechanism
+        async function initializeApp() {
+            try {
+                console.log('Initializing Mira Astrology Review System...');
+                
+                // Load data with retry mechanism
+                let retryCount = 0;
+                const maxRetries = 3;
+                
+                while (retryCount < maxRetries) {
+                    try {
+                        await loadSessions();
+                        await loadStats();
+                        console.log('App initialized successfully');
+                        break;
+                    } catch (error) {
+                        retryCount++;
+                        console.warn(`Initialization attempt ${retryCount} failed:`, error);
+                        if (retryCount < maxRetries) {
+                            console.log(`Retrying in ${retryCount * 1000}ms...`);
+                            await new Promise(resolve => setTimeout(resolve, retryCount * 1000));
+                        } else {
+                            console.error('Failed to initialize app after', maxRetries, 'attempts');
+                            // Show error message to user
+                            let sessionsGrid = document.getElementById('sessionsGrid');
+                            if (sessionsGrid) {
+                                sessionsGrid.innerHTML = `
+                                    <div style="grid-column: 1/-1; text-align: center; padding: 60px; color: #f44336;">
+                                        <h3>⚠️ Loading Error</h3>
+                                        <p>Failed to load session data. Please refresh the page.</p>
+                                        <button onclick="location.reload()" style="margin-top: 15px; padding: 10px 20px; background: var(--mira-red); color: white; border: none; border-radius: 5px; cursor: pointer;">
+                                            🔄 Refresh Page
+                                        </button>
+                                    </div>
+                                `;
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Critical initialization error:', error);
+            }
+        }
+        
+
+        // No infinite scroll needed - all sessions loaded at once
+
+        // Initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeApp);
+        } else {
+            initializeApp();
+        }
+        
+        // Reload data when page becomes visible (handles tab switching, window focus)
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                console.log('Page became visible, reloading data...');
+                setTimeout(() => {
+                    loadSessions();
+                    loadStats();
+                }, 100);
+            }
+        });
+        
+        // Reload data when window gains focus
+        window.addEventListener('focus', function() {
+            console.log('Window gained focus, reloading data...');
+            setTimeout(() => {
+                loadSessions();
+                loadStats();
+            }, 100);
+        });
+        
+        // Handle page show event (back/forward navigation)
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted) {
+                console.log('Page restored from cache, reloading data...');
+                setTimeout(() => {
+                    loadSessions();
+                    loadStats();
+                }, 100);
+            }
+        });
+        
+        // Google Sheets Sync Functions
+        async function syncFromSheets() {
+            showMessage('syncMessage', 'Syncing data FROM Google Sheets...', 'info');
+            try {
+                const response = await fetch('/api/sync-from-sheets', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showMessage('syncMessage', result.message, 'success');
+                    // Refresh the session data after sync
+                    setTimeout(() => {
+                        loadSessions();
+                        loadStats();
+                    }, 1000);
+                } else {
+                    showMessage('syncMessage', result.error || 'Sync failed', 'error');
+                }
+            } catch (error) {
+                showMessage('syncMessage', 'Error: ' + error.message, 'error');
+            }
+        }
+        
+        async function syncToSheets() {
+            showMessage('syncMessage', 'Syncing data TO Google Sheets...', 'info');
+            try {
+                const response = await fetch('/api/sync-to-sheets', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showMessage('syncMessage', result.message, 'success');
+                } else {
+                    showMessage('syncMessage', result.error || 'Sync failed', 'error');
+                }
+            } catch (error) {
+                showMessage('syncMessage', 'Error: ' + error.message, 'error');
+            }
+        }
+        
+        async function fullSync() {
+            showMessage('syncMessage', 'Performing full bidirectional sync...', 'info');
+            try {
+                const response = await fetch('/api/full-sync', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showMessage('syncMessage', result.message, 'success');
+                    // Refresh the session data after sync
+                    setTimeout(() => {
+                        loadSessions();
+                        loadStats();
+                    }, 1000);
+                } else {
+                    showMessage('syncMessage', result.error || 'Sync failed', 'error');
+                }
+            } catch (error) {
+                showMessage('syncMessage', 'Error: ' + error.message, 'error');
+            }
+        }
+        
+        async function checkSheetsStatus() {
+            showMessage('syncMessage', 'Checking Google Sheets status...', 'info');
+            try {
+                const response = await fetch('/api/sheets-status');
+                const result = await response.json();
+                
+                if (response.ok) {
+                    const status = result.enabled ? 'ENABLED ✅' : 'DISABLED ❌';
+                    const message = `Google Sheets Integration: ${status}`;
+                    showMessage('syncMessage', message, result.enabled ? 'success' : 'error');
+                } else {
+                    showMessage('syncMessage', 'Failed to check status', 'error');
+                }
+            } catch (error) {
+                showMessage('syncMessage', 'Error: ' + error.message, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+# Google Sheets Credentials
+credentials.json
+*.json
+!vercel.json
+!package.json
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+mira_analysis.db
+
+# Test and Debug Files
+test_*.py
+debug_*.py
+check_*.py
+comprehensive_*.py
+simple_*.py
+verify_*.py
+investigate_*.py
+fix_*.py
+force_*.py
+
+# Generated Images
+*.png
+*.jpg
+*.jpeg
+
+# Sample Data
+*.xlsx
+sample_*.json
+
+# Large Files
+ngrok.exe
+ngrok.zip
+
+# Flask
+instance/
+.webassets-cache
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Uploads
+uploads/
+exports/
+
+# Logs
+*.log
