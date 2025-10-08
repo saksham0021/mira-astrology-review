@@ -90,22 +90,26 @@ def get_cached_sheets_data():
     # Check if cache is valid
     if (sheets_cache['data'] is not None and 
         current_time - sheets_cache['last_updated'] < sheets_cache['cache_duration']):
-        print("DEBUG: Using cached Google Sheets data")
+        print(f"DEBUG: Using cached Google Sheets data ({len(sheets_cache['data'])} records)")
         return sheets_cache['data']
     
     # Cache is expired or empty, fetch new data
     if google_sync:
         try:
-            print("DEBUG: Fetching fresh Google Sheets data")
+            print("DEBUG: Fetching fresh Google Sheets data...")
             data = google_sync.get_all_data()
             sheets_cache['data'] = data
             sheets_cache['last_updated'] = current_time
-            print(f"DEBUG: Cached {len(data)} records from Google Sheets")
+            print(f"DEBUG: Successfully cached {len(data)} records from Google Sheets")
             return data
         except Exception as e:
             print(f"ERROR: Failed to fetch Google Sheets data: {e}")
+            import traceback
+            traceback.print_exc()
             # Return cached data if available, even if expired
             return sheets_cache['data'] if sheets_cache['data'] else []
+    else:
+        print("WARNING: google_sync is None - Google Sheets not connected")
     
     return []
 
@@ -661,21 +665,20 @@ def get_stats():
     # Ensure database is initialized
     init_db()
     
-    conn = sqlite3.connect('mira_analysis.db')
-    cursor = conn.cursor()
-    
-    cursor.execute('SELECT COUNT(*) FROM sessions')
-    total_sessions = cursor.fetchone()[0]
-    
     # Force fresh data if requested
     if request.args.get('force_fresh'):
         print("DEBUG: Forcing fresh Google Sheets data for stats")
         sheets_cache['last_updated'] = 0  # Invalidate cache
     
-    # Count reviewed sessions from Google Sheets data (cached for performance)
+    # Count sessions and reviews directly from Google Sheets data (primary source)
+    total_sessions = 0
     reviewed_sessions = 0
     records = get_cached_sheets_data()
+    
     if records:
+        print(f"DEBUG: Got {len(records)} records from Google Sheets for stats")
+        total_sessions = len(records)
+        
         try:
             # Count sessions with review status data - ONLY based on 'Review Status' column
             for record in records:
@@ -688,29 +691,44 @@ def get_stats():
                     
         except Exception as e:
             print(f"ERROR: Could not get review count from Google Sheets: {e}")
-            # Fallback to local database count
-            cursor.execute('SELECT COUNT(DISTINCT session_id) FROM reviews')
-            reviewed_sessions = cursor.fetchone()[0]
     else:
         # Fallback to local database count if Google Sheets not available
+        print("DEBUG: No Google Sheets data, falling back to database")
+        conn = sqlite3.connect('mira_analysis.db')
+        cursor = conn.cursor()
+        
+        cursor.execute('SELECT COUNT(*) FROM sessions')
+        total_sessions = cursor.fetchone()[0]
+        
         cursor.execute('SELECT COUNT(DISTINCT session_id) FROM reviews')
         reviewed_sessions = cursor.fetchone()[0]
+        
+        conn.close()
+    
+    # Get accuracy data from database (optional metrics)
+    conn = sqlite3.connect('mira_analysis.db')
+    cursor = conn.cursor()
     
     cursor.execute('SELECT AVG(accuracy_rating) FROM reviews')
-    avg_rating = cursor.fetchone()[0] or 0
+    avg_rating_result = cursor.fetchone()
+    avg_rating = avg_rating_result[0] if avg_rating_result and avg_rating_result[0] else 0
     
     cursor.execute('''
         SELECT 
-            SUM(CASE WHEN kundli_correct = 1 THEN 1 ELSE 0 END) * 100.0 / COUNT(*) as kundli_accuracy,
-            SUM(CASE WHEN dasha_correct = 1 THEN 1 ELSE 0 END) * 100.0 / COUNT(*) as dasha_accuracy,
-            SUM(CASE WHEN dosha_correct = 1 THEN 1 ELSE 0 END) * 100.0 / COUNT(*) as dosha_accuracy,
-            SUM(CASE WHEN analysis_correct = 1 THEN 1 ELSE 0 END) * 100.0 / COUNT(*) as analysis_accuracy
+            SUM(CASE WHEN kundli_correct = 1 THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(*), 0) as kundli_accuracy,
+            SUM(CASE WHEN dasha_correct = 1 THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(*), 0) as dasha_accuracy,
+            SUM(CASE WHEN dosha_correct = 1 THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(*), 0) as dosha_accuracy,
+            SUM(CASE WHEN analysis_correct = 1 THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(*), 0) as analysis_accuracy
         FROM reviews
     ''')
     
     accuracies = cursor.fetchone()
     
     conn.close()
+    
+    # Log stats for debugging
+    print(f"DEBUG: Stats - Total: {total_sessions}, Reviewed: {reviewed_sessions}, Pending: {total_sessions - reviewed_sessions}")
+    print(f"DEBUG: Google Sheets connected: {google_sheets_connected}")
     
     # Create response with no-cache headers
     response = make_response(jsonify({
