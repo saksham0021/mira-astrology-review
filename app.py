@@ -706,23 +706,35 @@ def get_stats():
         conn.close()
     
     # Get accuracy data from database (optional metrics)
+    # These columns may not exist in all database versions, so we'll use safe defaults
     conn = sqlite3.connect('mira_analysis.db')
     cursor = conn.cursor()
     
-    cursor.execute('SELECT AVG(accuracy_rating) FROM reviews')
-    avg_rating_result = cursor.fetchone()
-    avg_rating = avg_rating_result[0] if avg_rating_result and avg_rating_result[0] else 0
+    # Check if accuracy columns exist before querying
+    cursor.execute("PRAGMA table_info(reviews)")
+    columns = [row[1] for row in cursor.fetchall()]
     
-    cursor.execute('''
-        SELECT 
-            SUM(CASE WHEN kundli_correct = 1 THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(*), 0) as kundli_accuracy,
-            SUM(CASE WHEN dasha_correct = 1 THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(*), 0) as dasha_accuracy,
-            SUM(CASE WHEN dosha_correct = 1 THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(*), 0) as dosha_accuracy,
-            SUM(CASE WHEN analysis_correct = 1 THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(*), 0) as analysis_accuracy
-        FROM reviews
-    ''')
+    avg_rating = 0
+    accuracies = (0, 0, 0, 0)
     
-    accuracies = cursor.fetchone()
+    try:
+        if 'accuracy_rating' in columns:
+            cursor.execute('SELECT AVG(accuracy_rating) FROM reviews')
+            avg_rating_result = cursor.fetchone()
+            avg_rating = avg_rating_result[0] if avg_rating_result and avg_rating_result[0] else 0
+        
+        if all(col in columns for col in ['kundli_correct', 'dasha_correct', 'dosha_correct', 'analysis_correct']):
+            cursor.execute('''
+                SELECT 
+                    SUM(CASE WHEN kundli_correct = 1 THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(*), 0) as kundli_accuracy,
+                    SUM(CASE WHEN dasha_correct = 1 THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(*), 0) as dasha_accuracy,
+                    SUM(CASE WHEN dosha_correct = 1 THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(*), 0) as dosha_accuracy,
+                    SUM(CASE WHEN analysis_correct = 1 THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(*), 0) as analysis_accuracy
+                FROM reviews
+            ''')
+            accuracies = cursor.fetchone()
+    except Exception as e:
+        print(f"WARNING: Could not fetch accuracy metrics: {e}")
     
     conn.close()
     
