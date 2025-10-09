@@ -29,56 +29,6 @@ sheets_cache = {
     'cache_duration': 300  # 5 minutes cache
 }
 
-def get_cached_sheets_data():
-    """Get Google Sheets data with caching to improve performance"""
-    current_time = time.time()
-    
-    # Check if cache is valid
-    if (sheets_cache['data'] is not None and 
-        current_time - sheets_cache['last_updated'] < sheets_cache['cache_duration']):
-        print("DEBUG: Using cached Google Sheets data")
-        return sheets_cache['data']
-    
-    # Cache is expired or empty, fetch new data
-    if google_sync:
-        try:
-            print("DEBUG: Fetching fresh Google Sheets data")
-            data = google_sync.get_all_data()
-            sheets_cache['data'] = data
-            sheets_cache['last_updated'] = current_time
-            print(f"DEBUG: Cached {len(data)} records from Google Sheets")
-            return data
-        except Exception as e:
-            print(f"ERROR: Failed to fetch Google Sheets data: {e}")
-            # Return cached data if available, even if expired
-            return sheets_cache['data'] if sheets_cache['data'] else []
-    
-    return []
-
-# Google Sheets configuration
-app.config['GOOGLE_SHEETS_URL'] = 'https://docs.google.com/spreadsheets/d/1fd3YNixXYHcvyDgq2TcOHG6PGlzryt5T4nT2ObXUScM/edit?usp=sharing'
-app.config['GOOGLE_CREDENTIALS_FILE'] = 'credentials.json/credentials.json'
-
-# Initialize Google Sheets sync if available
-google_sync = None
-if GOOGLE_SHEETS_ENABLED and os.path.exists(app.config['GOOGLE_CREDENTIALS_FILE']):
-    try:
-        google_sync = GoogleSheetsSync(
-            credentials_file=app.config['GOOGLE_CREDENTIALS_FILE'],
-            spreadsheet_url=app.config['GOOGLE_SHEETS_URL']
-        )
-        if google_sync.connect():
-            print("SUCCESS: Google Sheets integration enabled")
-        else:
-            google_sync = None
-    except Exception as e:
-        print(f"WARNING: Could not initialize Google Sheets: {e}")
-        google_sync = None
-
-# Create necessary directories
-os.makedirs('exports', exist_ok=True)
-
-
 def init_db():
     """Initialize SQLite database"""
     conn = sqlite3.connect('mira_analysis.db')
@@ -132,6 +82,102 @@ def init_db():
     
     conn.commit()
     conn.close()
+
+def get_cached_sheets_data():
+    """Get Google Sheets data with caching to improve performance"""
+    current_time = time.time()
+    
+    # Check if cache is valid
+    if (sheets_cache['data'] is not None and 
+        current_time - sheets_cache['last_updated'] < sheets_cache['cache_duration']):
+        print(f"DEBUG: Using cached Google Sheets data ({len(sheets_cache['data'])} records)")
+        return sheets_cache['data']
+    
+    # Cache is expired or empty, fetch new data
+    if google_sync:
+        try:
+            print("DEBUG: Fetching fresh Google Sheets data...")
+            data = google_sync.get_all_data()
+            sheets_cache['data'] = data
+            sheets_cache['last_updated'] = current_time
+            print(f"DEBUG: Successfully cached {len(data)} records from Google Sheets")
+            return data
+        except Exception as e:
+            print(f"ERROR: Failed to fetch Google Sheets data: {e}")
+            import traceback
+            traceback.print_exc()
+            # Return cached data if available, even if expired
+            return sheets_cache['data'] if sheets_cache['data'] else []
+    else:
+        print("WARNING: google_sync is None - Google Sheets not connected")
+    
+    return []
+
+# Google Sheets configuration
+app.config['GOOGLE_SHEETS_URL'] = os.environ.get('GOOGLE_SHEETS_URL') or 'https://docs.google.com/spreadsheets/d/1fd3YNixXYHcvyDgq2TcOHG6PGlzryt5T4nT2ObXUScM/edit?usp=sharing'
+app.config['GOOGLE_CREDENTIALS_FILE'] = os.environ.get('GOOGLE_CREDENTIALS_FILE') or 'credentials.json/credentials.json'
+app.config['GOOGLE_CREDENTIALS_JSON'] = os.environ.get('GOOGLE_CREDENTIALS_JSON')  # For env var credentials
+
+# Initialize Google Sheets sync if available
+google_sync = None
+if GOOGLE_SHEETS_ENABLED:
+    try:
+        # Try environment variable first (for Vercel/production)
+        if app.config.get('GOOGLE_CREDENTIALS_JSON'):
+            print("INFO: Using Google credentials from environment variable")
+            import tempfile
+            import json as json_lib
+            
+            # Create temporary credentials file from environment variable
+            credentials_data = app.config['GOOGLE_CREDENTIALS_JSON']
+            if isinstance(credentials_data, str):
+                # Validate it's proper JSON
+                json_lib.loads(credentials_data)
+            
+            with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+                f.write(credentials_data if isinstance(credentials_data, str) else json_lib.dumps(credentials_data))
+                temp_creds_file = f.name
+            
+            google_sync = GoogleSheetsSync(
+                credentials_file=temp_creds_file,
+                spreadsheet_url=app.config['GOOGLE_SHEETS_URL']
+            )
+            
+        # Fallback to credentials file
+        elif os.path.exists(app.config['GOOGLE_CREDENTIALS_FILE']):
+            print("INFO: Using Google credentials from file")
+            google_sync = GoogleSheetsSync(
+                credentials_file=app.config['GOOGLE_CREDENTIALS_FILE'],
+                spreadsheet_url=app.config['GOOGLE_SHEETS_URL']
+            )
+        else:
+            print("WARNING: No Google credentials found (checked env var GOOGLE_CREDENTIALS_JSON and file path)")
+            google_sync = None
+        
+        if google_sync and google_sync.connect():
+            print("SUCCESS: Google Sheets integration enabled")
+            
+            # Auto-sync data from Google Sheets to database on startup
+            try:
+                print("INFO: Auto-syncing data from Google Sheets to database...")
+                init_db()  # Ensure database exists
+                google_sync.sync_to_database()
+                print("SUCCESS: Auto-sync completed")
+            except Exception as sync_error:
+                print(f"WARNING: Auto-sync failed: {sync_error}")
+                import traceback
+                traceback.print_exc()
+        else:
+            google_sync = None
+            
+    except Exception as e:
+        print(f"WARNING: Could not initialize Google Sheets: {e}")
+        import traceback
+        traceback.print_exc()
+        google_sync = None
+
+# Create necessary directories
+os.makedirs('exports', exist_ok=True)
 
 @app.route('/')
 def index():
@@ -613,21 +659,26 @@ def export_data():
 @app.route('/stats')
 def get_stats():
     """Get review statistics - count reviews from Google Sheets"""
-    conn = sqlite3.connect('mira_analysis.db')
-    cursor = conn.cursor()
+    # Check if Google Sheets is configured
+    google_sheets_connected = google_sync is not None
     
-    cursor.execute('SELECT COUNT(*) FROM sessions')
-    total_sessions = cursor.fetchone()[0]
+    # Ensure database is initialized
+    init_db()
     
     # Force fresh data if requested
     if request.args.get('force_fresh'):
         print("DEBUG: Forcing fresh Google Sheets data for stats")
         sheets_cache['last_updated'] = 0  # Invalidate cache
     
-    # Count reviewed sessions from Google Sheets data (cached for performance)
+    # Count sessions and reviews directly from Google Sheets data (primary source)
+    total_sessions = 0
     reviewed_sessions = 0
     records = get_cached_sheets_data()
+    
     if records:
+        print(f"DEBUG: Got {len(records)} records from Google Sheets for stats")
+        total_sessions = len(records)
+        
         try:
             # Count sessions with review status data - ONLY based on 'Review Status' column
             for record in records:
@@ -640,29 +691,56 @@ def get_stats():
                     
         except Exception as e:
             print(f"ERROR: Could not get review count from Google Sheets: {e}")
-            # Fallback to local database count
-            cursor.execute('SELECT COUNT(DISTINCT session_id) FROM reviews')
-            reviewed_sessions = cursor.fetchone()[0]
     else:
         # Fallback to local database count if Google Sheets not available
+        print("DEBUG: No Google Sheets data, falling back to database")
+        conn = sqlite3.connect('mira_analysis.db')
+        cursor = conn.cursor()
+        
+        cursor.execute('SELECT COUNT(*) FROM sessions')
+        total_sessions = cursor.fetchone()[0]
+        
         cursor.execute('SELECT COUNT(DISTINCT session_id) FROM reviews')
         reviewed_sessions = cursor.fetchone()[0]
+        
+        conn.close()
     
-    cursor.execute('SELECT AVG(accuracy_rating) FROM reviews')
-    avg_rating = cursor.fetchone()[0] or 0
+    # Get accuracy data from database (optional metrics)
+    # These columns may not exist in all database versions, so we'll use safe defaults
+    conn = sqlite3.connect('mira_analysis.db')
+    cursor = conn.cursor()
     
-    cursor.execute('''
-        SELECT 
-            SUM(CASE WHEN kundli_correct = 1 THEN 1 ELSE 0 END) * 100.0 / COUNT(*) as kundli_accuracy,
-            SUM(CASE WHEN dasha_correct = 1 THEN 1 ELSE 0 END) * 100.0 / COUNT(*) as dasha_accuracy,
-            SUM(CASE WHEN dosha_correct = 1 THEN 1 ELSE 0 END) * 100.0 / COUNT(*) as dosha_accuracy,
-            SUM(CASE WHEN analysis_correct = 1 THEN 1 ELSE 0 END) * 100.0 / COUNT(*) as analysis_accuracy
-        FROM reviews
-    ''')
+    # Check if accuracy columns exist before querying
+    cursor.execute("PRAGMA table_info(reviews)")
+    columns = [row[1] for row in cursor.fetchall()]
     
-    accuracies = cursor.fetchone()
+    avg_rating = 0
+    accuracies = (0, 0, 0, 0)
+    
+    try:
+        if 'accuracy_rating' in columns:
+            cursor.execute('SELECT AVG(accuracy_rating) FROM reviews')
+            avg_rating_result = cursor.fetchone()
+            avg_rating = avg_rating_result[0] if avg_rating_result and avg_rating_result[0] else 0
+        
+        if all(col in columns for col in ['kundli_correct', 'dasha_correct', 'dosha_correct', 'analysis_correct']):
+            cursor.execute('''
+                SELECT 
+                    SUM(CASE WHEN kundli_correct = 1 THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(*), 0) as kundli_accuracy,
+                    SUM(CASE WHEN dasha_correct = 1 THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(*), 0) as dasha_accuracy,
+                    SUM(CASE WHEN dosha_correct = 1 THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(*), 0) as dosha_accuracy,
+                    SUM(CASE WHEN analysis_correct = 1 THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(*), 0) as analysis_accuracy
+                FROM reviews
+            ''')
+            accuracies = cursor.fetchone()
+    except Exception as e:
+        print(f"WARNING: Could not fetch accuracy metrics: {e}")
     
     conn.close()
+    
+    # Log stats for debugging
+    print(f"DEBUG: Stats - Total: {total_sessions}, Reviewed: {reviewed_sessions}, Pending: {total_sessions - reviewed_sessions}")
+    print(f"DEBUG: Google Sheets connected: {google_sheets_connected}")
     
     # Create response with no-cache headers
     response = make_response(jsonify({
@@ -673,7 +751,9 @@ def get_stats():
         'kundli_accuracy': round(accuracies[0] or 0, 2),
         'dasha_accuracy': round(accuracies[1] or 0, 2),
         'dosha_accuracy': round(accuracies[2] or 0, 2),
-        'analysis_accuracy': round(accuracies[3] or 0, 2)
+        'analysis_accuracy': round(accuracies[3] or 0, 2),
+        'google_sheets_connected': google_sheets_connected,
+        'google_sheets_url': app.config['GOOGLE_SHEETS_URL'] if google_sheets_connected else None
     }))
     response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
     response.headers['Pragma'] = 'no-cache'
