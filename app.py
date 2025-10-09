@@ -57,7 +57,7 @@ def get_cached_sheets_data():
 
 # Google Sheets configuration
 app.config['GOOGLE_SHEETS_URL'] = 'https://docs.google.com/spreadsheets/d/1fd3YNixXYHcvyDgq2TcOHG6PGlzryt5T4nT2ObXUScM/edit?usp=sharing'
-app.config['GOOGLE_CREDENTIALS_FILE'] = 'credentials.json/credentials.json'
+app.config['GOOGLE_CREDENTIALS_FILE'] = os.environ.get('GOOGLE_CREDENTIALS_FILE', 'credentials.json')
 
 # Initialize Google Sheets sync if available
 google_sync = None
