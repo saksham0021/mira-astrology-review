@@ -4031,13 +4031,37 @@
                         astrologer_name: 'System Reviewer'
                     };
                     currentSession.review_status = 'completed';
+                    currentSession.reviewed = true;
                     
-                    // Refresh the sessions list, stats, and close modal to return to main page
+                    // Optimistically remove the reviewed session from displayed list immediately
+                    // This prevents the session from appearing briefly after modal closes
+                    allSessions = allSessions.map(s => {
+                        if (s.session_id === currentSession.session_id) {
+                            return {
+                                ...s,
+                                reviewed: true,
+                                review_status: 'completed',
+                                existing_review: currentSession.existing_review
+                            };
+                        }
+                        return s;
+                    });
+                    
+                    // Filter out the reviewed session from the display
+                    filteredSessions = filteredSessions.filter(s => s.session_id !== currentSession.session_id);
+                    
+                    // Re-render without the reviewed session
+                    renderSessions(filteredSessions, false);
+                    
+                    // Close modal first, then refresh data from backend after a short delay
                     setTimeout(() => {
-                        loadSessions();
-                        loadStats();
                         closeModal();
-                    }, 1500);
+                        // Refresh from backend to get the latest state
+                        setTimeout(() => {
+                            loadSessions();
+                            loadStats();
+                        }, 100);
+                    }, 800);
                 } else {
                     showMessage('reviewMessage', result.error || 'Failed to complete analysis', 'error');
                 }
