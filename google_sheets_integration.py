@@ -149,6 +149,67 @@ class GoogleSheetsSync:
                 ))
                 synced_count += 1
         
+        # Sync reviews from the sheet to database
+        print("DEBUG: Starting review sync from Google Sheets to database")
+        review_synced_count = 0
+        review_updated_count = 0
+        
+        for record in records:
+            session_id = record.get('session_id') or record.get('Session ID')
+            
+            if not session_id:
+                continue
+            
+            # Extract review data from the sheet
+            review_status = record.get('Review Status') or record.get('review_status')
+            overall_status = record.get('Overall Status') or record.get('overall_status')
+            comments = record.get('Comments') or record.get('comments')
+            reviewed_by = record.get('Reviewed By') or record.get('reviewed_by')
+            
+            # Only process if there's meaningful review data
+            if (review_status and review_status.strip() and review_status.strip().lower() not in ['', 'not_started']) or \
+               (overall_status and overall_status.strip() and overall_status.strip().lower() not in ['', 'none']) or \
+               (comments and comments.strip()) or \
+               (reviewed_by and reviewed_by.strip() and reviewed_by.strip().lower() not in ['', 'none', 'system reviewer']):
+                
+                # Check if review exists
+                cursor.execute('SELECT id FROM reviews WHERE session_id = ?', (session_id,))
+                existing_review = cursor.fetchone()
+                
+                if existing_review:
+                    # Update existing review
+                    cursor.execute('''
+                        UPDATE reviews SET
+                        astrologer_name = ?,
+                        overall_status = ?,
+                        comments = ?,
+                        status = ?,
+                        updated_at = CURRENT_TIMESTAMP
+                        WHERE session_id = ?
+                    ''', (
+                        reviewed_by or 'System Reviewer',
+                        overall_status,
+                        comments,
+                        review_status or 'completed',
+                        session_id
+                    ))
+                    review_updated_count += 1
+                else:
+                    # Insert new review
+                    cursor.execute('''
+                        INSERT INTO reviews (session_id, astrologer_name, overall_status, comments, status)
+                        VALUES (?, ?, ?, ?, ?)
+                    ''', (
+                        session_id,
+                        reviewed_by or 'System Reviewer',
+                        overall_status,
+                        comments,
+                        review_status or 'completed'
+                    ))
+                    review_synced_count += 1
+        
+        print(f"DEBUG: Review sync complete: {review_synced_count} new reviews, {review_updated_count} updated reviews")
+        
         # Get all session IDs from the sheet
         sheet_session_ids = set()
         for record in records:
@@ -209,12 +270,33 @@ class GoogleSheetsSync:
         db_reviewed_sessions = [str(row[0]) for row in cursor.fetchall()]
         
         # Delete reviews that are no longer marked in the sheet
+        # IMPORTANT: Never delete reviews that have comments or overall_status in the database
+        # This preserves reviews even if marking is removed from the sheet
         review_deleted_count = 0
         for db_session_id in db_reviewed_sessions:
             if db_session_id not in sheet_reviewed_sessions:
+                # Check if this review has meaningful data in the database
+                cursor.execute('SELECT comments, overall_status FROM reviews WHERE session_id = ?', (db_session_id,))
+                review_data = cursor.fetchone()
+                
+                if review_data:
+                    comments = review_data[0]
+                    overall_status = review_data[1]
+                    
+                    # Only delete if BOTH comments and overall_status are empty
+                    has_meaningful_data = (
+                        (comments and comments.strip()) or
+                        (overall_status and overall_status.strip() and overall_status.strip().lower() not in ['none', ''])
+                    )
+                    
+                    if has_meaningful_data:
+                        print(f"INFO: Preserving review for session {db_session_id} (has comments or overall_status)")
+                        continue
+                
+                # Safe to delete - no meaningful data
                 cursor.execute('DELETE FROM reviews WHERE session_id = ?', (db_session_id,))
                 review_deleted_count += 1
-                print(f"INFO: Deleted review for session {db_session_id} (no longer marked in sheet)")
+                print(f"INFO: Deleted review for session {db_session_id} (no marking in sheet and no local data)")
         
         conn.commit()
         conn.close()

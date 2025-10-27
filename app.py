@@ -4,6 +4,7 @@ import sqlite3
 import json
 import os
 import time
+import threading
 from datetime import datetime
 from google_sheets_integration import GoogleSheetsSync
 from kundli_chart_generator import generate_kundli_image, kundli_to_bytes, generate_kundli_from_parsed_data
@@ -26,7 +27,7 @@ app.secret_key = os.environ.get('SECRET_KEY', 'dev-key-change-in-production')
 sheets_cache = {
     'data': None,
     'last_updated': 0,
-    'cache_duration': 300  # 5 minutes cache
+    'cache_duration': 60  # 1 minute cache for faster updates
 }
 
 def get_cached_sheets_data():
@@ -74,6 +75,50 @@ if GOOGLE_SHEETS_ENABLED and os.path.exists(app.config['GOOGLE_CREDENTIALS_FILE'
     except Exception as e:
         print(f"WARNING: Could not initialize Google Sheets: {e}")
         google_sync = None
+
+# Background sync thread
+sync_thread = None
+sync_running = False
+
+def background_sync_from_sheets():
+    """Background thread to periodically sync data from Google Sheets"""
+    global sync_running, google_sync, sheets_cache
+    sync_interval = 120  # Sync every 2 minutes
+    
+    while sync_running:
+        try:
+            if google_sync:
+                print("DEBUG: Background sync started - syncing from Google Sheets to database")
+                google_sync.sync_to_database()
+                # Invalidate cache to ensure fresh data is fetched
+                sheets_cache['last_updated'] = 0
+                print("DEBUG: Background sync completed - cache invalidated")
+            else:
+                print("WARNING: Google Sheets sync not available for background sync")
+        except Exception as e:
+            print(f"ERROR: Background sync failed: {e}")
+        
+        # Wait for the interval before next sync
+        for _ in range(sync_interval):
+            if not sync_running:
+                break
+            time.sleep(1)
+    
+    print("INFO: Background sync thread stopped")
+
+def start_background_sync():
+    """Start the background sync thread"""
+    global sync_thread, sync_running
+    
+    if not sync_running:
+        sync_running = True
+        sync_thread = threading.Thread(target=background_sync_from_sheets, daemon=True)
+        sync_thread.start()
+        print("INFO: Background sync thread started (syncs every 2 minutes)")
+
+# Start background sync if Google Sheets is enabled
+if google_sync:
+    start_background_sync()
 
 # Create necessary directories
 os.makedirs('exports', exist_ok=True)
@@ -216,15 +261,25 @@ def get_sessions():
                     comments = record.get('Comments') or record.get('comments')
                     reviewed_by = record.get('Reviewed By') or record.get('reviewed_by')
                     
-                    # Check if this session has review data
-                    has_review = (review_status and review_status.strip() and review_status.strip().lower() not in ['', 'not_started', 'none'])
+                    # Check if this session has review data - including comments even without review_status
+                    # This ensures sessions with comments are shown even if marking is removed
+                    has_review_status = (review_status and review_status.strip() and review_status.strip().lower() not in ['', 'not_started', 'none'])
+                    has_comments = (comments and comments.strip())
+                    has_overall = (overall_status and overall_status.strip() and overall_status.strip().lower() not in ['', 'none'])
+                    has_reviewer = (reviewed_by and reviewed_by.strip() and reviewed_by.strip().lower() not in ['', 'none', 'system reviewer'])
+                    
+                    # If it has ANY review data (status, comments, overall_status, or reviewer), include it
+                    has_review = has_review_status or has_comments or has_overall or has_reviewer
                     
                     if has_review:
+                        # Determine if it's truly reviewed or just has comments
+                        is_reviewed = has_review_status or has_overall
                         google_reviews[str(session_id)] = {
-                            'review_status': review_status or 'completed',
+                            'review_status': review_status if has_review_status else 'not_started',
                             'overall_status': overall_status,
                             'comments': comments,
-                            'astrologer_name': reviewed_by or 'System Reviewer'
+                            'astrologer_name': reviewed_by or 'System Reviewer',
+                            'is_reviewed': is_reviewed  # Flag to indicate if truly reviewed or just has comments
                         }
         except Exception as e:
             print(f"ERROR: Could not process cached Google Sheets data: {e}")
@@ -287,7 +342,9 @@ def get_sessions():
                     }
                 elif google_review:
                     # Fallback to Google Sheets data
-                    reviewed = True
+                    # Use the is_reviewed flag to determine if truly reviewed or just has comments
+                    is_reviewed = google_review.get('is_reviewed', False)
+                    reviewed = is_reviewed  # Only mark as reviewed if it has review status or overall status
                     review_status = google_review['review_status']
                     astrologer_name = google_review['astrologer_name']
                     existing_review = {
@@ -625,19 +682,29 @@ def get_stats():
         sheets_cache['last_updated'] = 0  # Invalidate cache
     
     # Count reviewed sessions from Google Sheets data (cached for performance)
+    # IMPORTANT: Only count sessions that exist in the database and have reviews
     reviewed_sessions = 0
     records = get_cached_sheets_data()
+    
+    # Get all session IDs from database to ensure we only count existing sessions
+    cursor.execute('SELECT session_id FROM sessions')
+    db_session_ids = set(str(row[0]) for row in cursor.fetchall())
+    
     if records:
         try:
-            # Count sessions with review status data - ONLY based on 'Review Status' column
+            # Count sessions with review status data - check if session exists in database
             for record in records:
-                review_status = record.get('Review Status') or record.get('review_status')
+                session_id = record.get('session_id') or record.get('Session ID')
                 
-                # Count as reviewed ONLY if Review Status column has meaningful data
-                if (review_status and review_status.strip() and 
-                    review_status.strip().lower() not in ['', 'not_started', 'none']):
-                    reviewed_sessions += 1
+                # Only count if this session exists in our database
+                if session_id and str(session_id) in db_session_ids:
+                    review_status = record.get('Review Status') or record.get('review_status')
                     
+                    # Count as reviewed ONLY if Review Status column has meaningful data
+                    if (review_status and review_status.strip() and 
+                        review_status.strip().lower() not in ['', 'not_started', 'none']):
+                        reviewed_sessions += 1
+                        
         except Exception as e:
             print(f"ERROR: Could not get review count from Google Sheets: {e}")
             # Fallback to local database count

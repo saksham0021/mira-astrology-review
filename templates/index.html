@@ -2842,8 +2842,9 @@
                 // Store all sessions for filtering
                 allSessions = sessions;
                 
-                // Filter to show only unmarked sessions by default
-                const unmarkedSessions = sessions.filter(session => session.review_status === 'not_started' || !session.reviewed);
+                // Filter to show unmarked sessions (not reviewed)
+                // This includes sessions with comments but no review status (marking removed from Google Sheets)
+                const unmarkedSessions = sessions.filter(session => !session.reviewed);
                 filteredSessions = unmarkedSessions;
                 console.log(`Loaded ${sessions.length} total sessions, showing ${unmarkedSessions.length} unmarked sessions`);
                 
